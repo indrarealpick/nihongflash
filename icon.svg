@@ -1,0 +1,9 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="512" height="512" rx="96" fill="#F5F3EE"/>
+  <rect x="56" y="56" width="400" height="400" rx="72" fill="#FFD84D" stroke="#000000" stroke-width="20"/>
+  <rect x="56" y="56" width="400" height="400" rx="72" fill="#FF7A59" opacity="0"/>
+  <g>
+    <rect x="92" y="96" width="328" height="120" rx="28" fill="#FFFFFF" stroke="#000000" stroke-width="16" transform="rotate(-4 256 156)"/>
+  </g>
+  <text x="256" y="338" text-anchor="middle" font-family="'Noto Sans JP','Hiragino Sans','Yu Gothic',sans-serif" font-size="240" font-weight="900" fill="#111111">日</text>
+</svg>

@@ -1,0 +1,13 @@
+{
+  "name": "nihongo-flash-api",
+  "version": "1.0.0",
+  "description": "Serverless API (OpenRouter, openai/gpt-4.1) untuk Nihongo Flash",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "openai": "^4.77.0"
+  }
+}
