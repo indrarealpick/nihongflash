@@ -153,10 +153,11 @@ input,select,textarea{font-family:inherit}
 
 .bottom-nav{position:fixed;left:0;right:0;bottom:0;z-index:40;height:calc(var(--nav-h) + var(--safe-b));padding-bottom:var(--safe-b);background:var(--card);border-top:var(--bw) solid var(--border);display:flex}
 .bottom-nav .nav-inner{max-width:560px;margin:0 auto;width:100%;display:flex}
-.nav-btn{flex:1;background:none;border:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:6px 0;color:var(--text-2);font-weight:800;font-size:10.5px}
-.nav-btn svg{width:24px;height:24px}.nav-btn.active{color:var(--text)}
-.nav-btn.active .nav-ic{background:var(--primary);border-radius:12px;border:3px solid var(--border);padding:4px 12px}
-.nav-ic{padding:4px 12px;border:3px solid transparent;position:relative}
+.nav-btn{flex:1;background:none;border:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:6px 0;color:var(--text-2);font-weight:800;font-size:10px}
+.nav-btn svg{width:22px;height:22px}.nav-btn.active{color:var(--text)}
+.nav-btn.active .nav-ic{background:var(--primary);border-radius:12px;border:3px solid var(--border);padding:4px 9px}
+.nav-ic{padding:4px 9px;border:3px solid transparent;position:relative}
+.tag.n5{background:var(--accent)}.tag.n4{background:var(--primary)}.tag.ai{background:#e7e4dc}
 .nav-badge{position:absolute;top:-6px;right:-2px;min-width:18px;height:18px;padding:0 4px;background:var(--secondary);color:#fff;border:2px solid var(--border);border-radius:999px;font-size:10px;font-weight:900;display:flex;align-items:center;justify-content:center}
 
 #toasts{position:fixed;top:0;left:0;right:0;z-index:80;display:flex;flex-direction:column;gap:10px;padding:14px;max-width:560px;margin:0 auto;pointer-events:none}
@@ -382,6 +383,19 @@ input,select,textarea{font-family:inherit}
     </div>
   </section>
 
+  <!-- DICTIONARY -->
+  <section id="screen-dictionary" class="screen">
+    <div class="topbar"><h1>Kamus</h1><div class="spacer"></div><span class="tag" id="dict-count">JLPT</span></div>
+    <div class="page">
+      <div class="toolbar"><input class="input jp" id="dict-search" type="search" placeholder="🔍 Cari: 食べる / たべる / makan…" /></div>
+      <div class="toolbar">
+        <select class="select" id="dict-level"><option value="">Semua Level</option><option value="N5">N5</option><option value="N4">N4</option></select>
+      </div>
+      <div class="list" id="dict-list"></div>
+      <button class="btn btn-ghost load-more hidden" id="dict-more">Muat lebih banyak</button>
+    </div>
+  </section>
+
   <!-- PROGRESS -->
   <section id="screen-progress" class="screen">
     <div class="topbar"><h1>Progress</h1></div>
@@ -430,6 +444,7 @@ input,select,textarea{font-family:inherit}
     <button class="nav-btn" data-nav="dashboard"><span class="nav-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg></span><span>Home</span></button>
     <button class="nav-btn" data-nav="flashcard"><span class="nav-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/></svg></span><span>Flashcard</span></button>
     <button class="nav-btn" data-nav="review"><span class="nav-ic" id="nav-review-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></span><span>Review</span></button>
+    <button class="nav-btn" data-nav="dictionary"><span class="nav-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h13v18H6a2 2 0 0 1-2-2z"/><path d="M9 3v18"/></svg></span><span>Kamus</span></button>
     <button class="nav-btn" data-nav="notes"><span class="nav-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h12l4 4v12H4z"/><path d="M8 9h8M8 13h8M8 17h5"/></svg></span><span>Catatan</span></button>
     <button class="nav-btn" data-nav="settings"><span class="nav-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1.3l2-1.5-2-3.4-2.3 1a7 7 0 0 0-2.3-1.3L13.8 2h-4l-.3 2.5a7 7 0 0 0-2.3 1.3l-2.3-1-2 3.4 2 1.5A7 7 0 0 0 5 12a7 7 0 0 0 .1 1.3l-2 1.5 2 3.4 2.3-1a7 7 0 0 0 2.3 1.3l.3 2.5h4l.3-2.5a7 7 0 0 0 2.3-1.3l2.3 1 2-3.4-2-1.5A7 7 0 0 0 19 12z"/></svg></span><span>Setelan</span></button>
   </div></nav>
@@ -461,6 +476,7 @@ const State = {
   study:{ list:[], idx:0, flipped:false },
   review:{ list:[], idx:0, shown:false },
   fcLimit:60,
+  dictLimit:50, dictResults:[],
   autoplay: localStorage.getItem('nf_autoplay')==='1'
 };
 
@@ -701,7 +717,14 @@ async function addFlashcardForm(presetCat){
     const category_id=$('#m-fc-cat').value, word=$('#m-fc-word').value.trim();
     if(!word){toast('Masukkan kata Jepang','warning');return;}
     close(); overlay('Sedang membuat flashcard…');
-    try{ const {reading,meaning}=await fetchJapanese(word); const card=await createFlashcard({category_id,kanji:word,reading,meaning}); overlayOff(); if(card){toast('Flashcard dibuat 🎉','success'); refreshAll();} }
+    try{
+      let reading, meaning;
+      const dict=await lookupDictionary(word);            // 1) cek dictionary dulu
+      if(dict){ reading=dict.reading; meaning=dict.meaning; }
+      else { const r=await fetchJapanese(word); reading=r.reading; meaning=r.meaning; } // 2) fallback AI (+auto simpan ke dict di backend)
+      const card=await createFlashcard({category_id,kanji:word,reading,meaning}); overlayOff();
+      if(card){toast(dict?'Dari kamus 📖':'Flashcard dibuat 🎉','success'); refreshAll();}
+    }
     catch(err){ overlayOff(); toast(err.message||'Gagal','error',4000); manualFallback(category_id,word); }
   };
 }
@@ -769,10 +792,13 @@ async function runBatch(category_id, raw, skipExisting, root){
   prog.innerHTML=`<div class="batch-bar"><div class="batch-fill" id="b-fill"></div></div><div class="batch-count" id="b-count">0 / ${total}</div>`;
   formArea.appendChild(prog);
   let ok=0, fail=0; const rows=[];
+  const dictMap=await lookupDictionaryMany(words);   // cek dictionary sekaligus
   for(let i=0;i<total;i++){
     $('#b-count').textContent=`${i+1} / ${total}`;
     $('#b-fill').style.width=Math.round((i+1)/total*100)+'%';
-    try{ const {reading,meaning}=await fetchJapanese(words[i]); rows.push({user_id:State.user.id,category_id,kanji:words[i],reading,meaning,status:'belum_hafal',favorite:false,review_level:0,next_review_date:todayStr(),review_count:0}); ok++; }
+    const w=words[i]; const hit=dictMap[w];
+    if(hit){ rows.push({user_id:State.user.id,category_id,kanji:w,reading:hit.reading,meaning:hit.meaning,status:'belum_hafal',favorite:false,review_level:0,next_review_date:todayStr(),review_count:0}); ok++; continue; }
+    try{ const {reading,meaning}=await fetchJapanese(w); rows.push({user_id:State.user.id,category_id,kanji:w,reading,meaning,status:'belum_hafal',favorite:false,review_level:0,next_review_date:todayStr(),review_count:0}); ok++; }
     catch(e){ fail++; }
   }
   if(rows.length){ const {data,error}=await sb.from('flashcards').insert(rows).select(); if(!error&&data)State.flashcards=data.concat(State.flashcards); else if(error){ok=0;fail=total;toast('Gagal menyimpan ke database','error');} }
@@ -892,6 +918,72 @@ async function confirmDeleteNote(id){
   if(!ok)return; await deleteNote(id); toast('Catatan dihapus','success'); renderNotes();
 }
 
+/* ============================ DICTIONARY ============================ */
+/* Cek dictionary untuk satu kata (kanji atau reading sama persis) */
+async function lookupDictionary(word){
+  try{
+    const {data}=await sb.from('dictionary').select('kanji,reading,meaning,jlpt_level')
+      .or(`kanji.eq.${word},reading.eq.${word}`).limit(1).maybeSingle();
+    return data||null;
+  }catch(e){ return null; }
+}
+/* Cek banyak kata sekaligus (untuk batch) → map kanji→entry */
+async function lookupDictionaryMany(words){
+  const map={};
+  try{
+    const {data}=await sb.from('dictionary').select('kanji,reading,meaning').in('kanji',words);
+    (data||[]).forEach(d=>{ map[d.kanji]=d; });
+  }catch(e){}
+  return map;
+}
+/* Pencarian dictionary (kanji / hiragana / katakana / Indonesia) */
+async function searchDictionary(q, level){
+  let query=sb.from('dictionary').select('id,kanji,reading,meaning,jlpt_level');
+  if(level) query=query.eq('jlpt_level',level);
+  q=(q||'').trim();
+  if(q){
+    const hira=kataToHira(q);
+    const terms=[`kanji.ilike.%${q}%`,`reading.ilike.%${q}%`,`meaning.ilike.%${q}%`];
+    if(hira!==q) terms.push(`reading.ilike.%${hira}%`);
+    query=query.or(terms.join(','));
+  }
+  query=query.order('jlpt_level',{ascending:true}).limit(300);
+  const {data,error}=await query;
+  if(error){ toast('Gagal memuat kamus','error'); return []; }
+  return data||[];
+}
+let dictTimer=null;
+async function runDictionarySearch(){
+  const q=$('#dict-search').value, level=$('#dict-level').value;
+  const list=$('#dict-list'); list.innerHTML=`<div class="empty"><span class="em">⏳</span>Memuat…</div>`;
+  const res=await searchDictionary(q,level);
+  State.dictResults=res; State.dictLimit=50; renderDictionary();
+}
+function renderDictionary(){
+  const list=$('#dict-list'); const all=State.dictResults; const arr=all.slice(0,State.dictLimit);
+  $('#dict-count').textContent=`${all.length} kata`;
+  if(!all.length){ list.innerHTML=`<div class="empty nb"><span class="em">📕</span>Tidak ada hasil di kamus.<br/>Coba kata lain, atau tambahkan via Flashcard (AI).</div>`; $('#dict-more').classList.add('hidden'); return; }
+  list.innerHTML=arr.map(d=>{ const lv=(d.jlpt_level||'').toUpperCase(); const cls=lv==='N5'?'n5':lv==='N4'?'n4':'ai';
+    return `<div class="row-card nb jp"><div class="grow"><div class="title">${esc(d.kanji)}</div>
+      <div class="sub">${esc(d.reading||'')} · ${esc(d.meaning||'')}</div>
+      <div style="margin-top:8px;display:flex;gap:6px"><span class="tag ${cls}">${esc(lv||'—')}</span></div></div>
+      <div class="card-actions"><button class="btn btn-mini btn-ghost" data-dspk="${d.id}">🔊</button>
+      <button class="btn btn-mini btn-accent" data-dadd="${d.id}">➕</button></div></div>`; }).join('');
+  $('#dict-more').classList.toggle('hidden', all.length<=State.dictLimit);
+  $$('[data-dspk]',list).forEach(b=>b.onclick=()=>{ const d=all.find(x=>x.id===b.dataset.dspk); if(d)Speech.speak(d.kanji); });
+  $$('[data-dadd]',list).forEach(b=>b.onclick=()=>{ const d=all.find(x=>x.id===b.dataset.dadd); if(d)addDictToFlashcard(d); });
+}
+async function addDictToFlashcard(d){
+  if(!State.categories.length){ toast('Buat kategori terlebih dahulu','warning'); goto('category'); return; }
+  const opts=State.categories.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');
+  const ok=await modal({title:'Tambahkan ke Flashcard',
+    body:`<p>"${esc(d.kanji)}" (${esc(d.reading)}) — ${esc(d.meaning)}</p>
+      <div class="field"><label>Kategori</label><select class="select" id="m-da-cat" style="width:100%">${opts}</select></div>`,
+    confirmText:'Tambah',
+    onConfirm:async()=>{ const category_id=$('#m-da-cat').value; const card=await createFlashcard({category_id,kanji:d.kanji,reading:d.reading,meaning:d.meaning}); if(!card)return false; }});
+  if(ok){ toast('Ditambahkan ke flashcard 🎉','success'); refreshAll(); }
+}
+
 /* ============================ PROGRESS + CHARTS ============================ */
 function renderProgress(){
   const {total,hafal,belum,pct}=stats();
@@ -969,12 +1061,13 @@ function importData(file){
 /* ============================ NAV / REFRESH ============================ */
 function refreshAll(){ renderDashboard(); renderCategory(); refreshFilters(); renderFlashcards(); renderNotes(); renderProgress(); renderSettings(); }
 function goto(screen){
-  show(screen); setActiveNav(['dashboard','flashcard','review','notes','settings'].includes(screen)?screen:'');
+  show(screen); setActiveNav(['dashboard','flashcard','review','dictionary','notes','settings'].includes(screen)?screen:'');
   if(screen==='dashboard')renderDashboard();
   if(screen==='category')renderCategory();
   if(screen==='flashcard'){State.fcLimit=60;refreshFilters();renderFlashcards();}
   if(screen==='study')renderStudy();
   if(screen==='review'){startReview();renderReview();}
+  if(screen==='dictionary'){ if(!State.dictResults.length) runDictionarySearch(); else renderDictionary(); }
   if(screen==='notes'){refreshFilters();renderNotes();}
   if(screen==='progress')renderProgress();
   if(screen==='settings')renderSettings();
@@ -1014,6 +1107,10 @@ function bindEvents(){
   $('#note-add-btn').onclick=()=>noteForm(null);
   $('#note-search').addEventListener('input',()=>{clearTimeout(searchTimer);searchTimer=setTimeout(renderNotes,120);});
   $('#note-filter').addEventListener('change',renderNotes);
+
+  $('#dict-search').addEventListener('input',()=>{clearTimeout(dictTimer);dictTimer=setTimeout(runDictionarySearch,250);});
+  $('#dict-level').addEventListener('change',runDictionarySearch);
+  $('#dict-more').onclick=()=>{State.dictLimit+=50;renderDictionary();};
 
   $('#set-autoplay').addEventListener('change',e=>{ State.autoplay=e.target.checked; localStorage.setItem('nf_autoplay',State.autoplay?'1':'0'); });
   $('#btn-logout').onclick=doLogout; $('#btn-export').onclick=exportData;
