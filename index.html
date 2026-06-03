@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
+<meta name="theme-color" content="#FFD84D" />
+<meta name="description" content="Nihongo Flash — Belajar Bahasa Jepang Lebih Cepat." />
+<title>Nihongo Flash</title>
+
+<link rel="manifest" href="manifest.json" />
+<link rel="icon" type="image/svg+xml" href="icon.svg" />
+<link rel="apple-touch-icon" href="icon-192.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="Nihongo Flash" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet" />
+
+<style>
+:root{
+  --bg:#F5F3EE; --card:#FFFFFF; --primary:#FFD84D; --secondary:#FF7A59; --accent:#4CC9B0;
+  --text:#111111; --text-2:#444444; --border:#000000; --shadow:#000000;
+  --radius:16px; --bw:4px;
+  --shadow-sm:4px 4px 0 0 var(--shadow); --shadow-md:6px 6px 0 0 var(--shadow); --shadow-lg:8px 8px 0 0 var(--shadow);
+  --font:'Inter','Noto Sans JP',system-ui,sans-serif; --font-jp:'Noto Sans JP','Inter',sans-serif;
+  --nav-h:72px; --safe-b:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.5;font-weight:500;overflow-x:hidden;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(var(--border) 1px,transparent 1px);background-size:26px 26px;background-attachment:fixed;}
+button{font-family:inherit;cursor:pointer}
+input,select,textarea{font-family:inherit}
+:focus-visible{outline:3px solid var(--secondary);outline-offset:2px}
+.hidden{display:none !important}
+
+.nb{background:var(--card);border:var(--bw) solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-md)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:var(--bw) solid var(--border);border-radius:var(--radius);
+  background:var(--card);color:var(--text);font-weight:800;font-size:16px;padding:14px 18px;box-shadow:var(--shadow-sm);
+  transition:transform .08s ease,box-shadow .08s ease,background .15s ease;min-height:52px;width:100%;text-align:center;user-select:none}
+.btn:active{transform:translate(4px,4px);box-shadow:0 0 0 0 var(--shadow)}
+.btn-primary{background:var(--primary)}.btn-secondary{background:var(--secondary);color:#fff}
+.btn-accent{background:var(--accent);color:#04231d}.btn-ghost{background:var(--card)}.btn-danger{background:#FF4D4D;color:#fff}
+.btn-sm{padding:9px 12px;font-size:14px;min-height:40px;width:auto;box-shadow:var(--shadow-sm)}
+.btn-row{display:flex;gap:10px}.btn-icon{width:48px;min-height:48px;padding:0;flex:0 0 auto}
+.btn-mini{width:42px;min-height:42px;padding:0;flex:0 0 auto;font-size:18px}
+
+.field{margin-bottom:14px}
+.field label{display:block;font-weight:800;font-size:13px;margin-bottom:6px;letter-spacing:.02em}
+.input,.select,.textarea{width:100%;border:var(--bw) solid var(--border);border-radius:14px;background:#fff;padding:14px;font-size:16px;font-weight:600;box-shadow:var(--shadow-sm);transition:transform .08s ease,box-shadow .08s ease}
+.input:focus,.select:focus,.textarea:focus{outline:none;transform:translate(2px,2px);box-shadow:2px 2px 0 0 var(--shadow)}
+.input.jp,.textarea.jp{font-family:var(--font-jp)}
+.textarea{min-height:140px;resize:vertical;line-height:1.6}
+
+.tag{display:inline-flex;align-items:center;gap:6px;border:3px solid var(--border);border-radius:999px;padding:4px 12px;font-weight:800;font-size:12px;background:var(--primary)}
+.tag.green{background:var(--accent)}.tag.gray{background:#e7e4dc}.tag.orange{background:var(--secondary);color:#fff}
+
+#app{min-height:100%}
+.screen{display:none;animation:fade .25s ease}.screen.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.page{max-width:560px;margin:0 auto;padding:18px 16px calc(var(--nav-h) + var(--safe-b) + 24px)}
+.page-noNav{padding-bottom:32px}
+.topbar{position:sticky;top:0;z-index:30;background:var(--bg);border-bottom:var(--bw) solid var(--border);padding:14px 16px;display:flex;align-items:center;gap:12px;max-width:560px;margin:0 auto}
+.topbar h1{font-size:22px;font-weight:900;letter-spacing:-.02em}.topbar .spacer{flex:1}
+.section-title{font-size:13px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:var(--text-2);margin:22px 2px 10px}
+
+#screen-welcome .page{display:flex;flex-direction:column;min-height:100vh;justify-content:center;gap:18px}
+.brand{display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;margin-bottom:8px}
+.brand .logo{width:118px;height:118px}.brand h1{font-size:40px;font-weight:900;letter-spacing:-.03em;line-height:1}
+.brand .tag-line{font-weight:700;font-size:17px;color:var(--text-2)}
+.welcome-actions{display:flex;flex-direction:column;gap:14px;margin-top:10px}
+.divider{display:flex;align-items:center;gap:12px;color:var(--text-2);font-weight:800;font-size:13px}
+.divider::before,.divider::after{content:"";flex:1;height:3px;background:var(--border);border-radius:2px}
+.g-btn{background:#fff;display:flex;align-items:center;justify-content:center;gap:10px}.g-btn svg{width:22px;height:22px}
+
+.auth-card{margin-top:8px}.auth-card .pad{padding:22px}
+.auth-switch{text-align:center;margin-top:14px;font-weight:700;font-size:14px}
+.auth-switch a{color:var(--secondary);font-weight:900;text-decoration:underline;cursor:pointer}
+
+.hero{padding:20px;background:var(--primary)}
+.hero .hi{font-size:14px;font-weight:800;color:#5b4a00}
+.hero .name{font-size:26px;font-weight:900;letter-spacing:-.02em;margin-top:2px}
+.hero .streak{margin-top:10px;display:inline-flex;align-items:center;gap:6px;background:#fff;border:3px solid var(--border);border-radius:999px;padding:5px 12px;font-weight:900;font-size:14px}
+.stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:14px}
+.stat{padding:16px}.stat .num{font-size:30px;font-weight:900;line-height:1}
+.stat .lbl{font-size:12px;font-weight:800;color:var(--text-2);margin-top:6px;text-transform:uppercase;letter-spacing:.04em}
+.stat.full{grid-column:1/-1}.stat.p1{background:#fff}.stat.p2{background:var(--accent)}
+.stat.p3{background:var(--secondary);color:#fff}.stat.p3 .lbl{color:#ffe3da}.stat.p4{background:var(--primary)}
+.progress-wrap{margin-top:10px}
+.progress-bar{height:26px;border:var(--bw) solid var(--border);border-radius:999px;background:#fff;overflow:hidden;box-shadow:var(--shadow-sm)}
+.progress-fill{height:100%;background:var(--accent);width:0;transition:width .5s cubic-bezier(.2,.9,.3,1);border-right:var(--bw) solid var(--border)}
+.progress-meta{display:flex;justify-content:space-between;font-weight:800;font-size:13px;margin-top:8px}
+
+.banner{padding:16px;background:var(--secondary);color:#fff;display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.banner .grow{flex:1}.banner .bt{font-weight:900;font-size:15px}.banner .bs{font-size:13px;font-weight:700;color:#ffe3da}
+
+.list{display:flex;flex-direction:column;gap:12px}
+.row-card{padding:16px;display:flex;align-items:center;gap:10px}
+.row-card .grow{flex:1;min-width:0}
+.row-card .title{font-weight:900;font-size:17px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row-card .sub{font-size:13px;font-weight:700;color:var(--text-2);margin-top:2px}
+.row-card.jp .title{font-family:var(--font-jp)}
+.card-actions{display:flex;flex-direction:column;gap:6px}
+.empty{text-align:center;padding:34px 18px;color:var(--text-2);font-weight:700}
+.empty .em{font-size:46px;display:block;margin-bottom:10px}
+.toolbar{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.toolbar .input{flex:1;min-width:140px}.toolbar .select{flex:1;min-width:120px}
+.fab-add{margin-bottom:12px}
+.star{font-size:20px;line-height:1;filter:grayscale(1);opacity:.5}
+.star.on{filter:none;opacity:1}
+.load-more{margin-top:14px}
+
+.flip{perspective:1400px;width:100%;max-width:420px;height:300px}
+.flip-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .55s cubic-bezier(.2,.8,.3,1);cursor:pointer}
+.flip.flipped .flip-inner{transform:rotateY(180deg)}
+.flip-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border:var(--bw) solid var(--border);border-radius:24px;box-shadow:var(--shadow-lg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center}
+.flip-front{background:var(--primary)}.flip-back{background:var(--card);transform:rotateY(180deg)}
+.flip-front .kanji{font-family:var(--font-jp);font-weight:900;font-size:clamp(40px,15vw,76px);line-height:1.05}
+.flip-hint{position:absolute;bottom:14px;font-size:12px;font-weight:800;color:rgba(0,0,0,.45)}
+.flip-back .reading{font-family:var(--font-jp);font-weight:700;font-size:clamp(24px,8vw,38px);color:var(--secondary)}
+.flip-back .rd-lbl,.flip-back .mn-lbl{font-size:11px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--text-2)}
+.flip-back .meaning{font-weight:900;font-size:clamp(20px,7vw,30px)}
+.speak-btn{position:absolute;top:12px;right:12px;width:46px;height:46px;border:3px solid var(--border);border-radius:12px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:var(--shadow-sm)}
+.study-wrap{display:flex;flex-direction:column;gap:16px;align-items:center}
+.study-progress{font-weight:800;font-size:14px;color:var(--text-2)}
+.study-actions{display:flex;gap:12px;width:100%;max-width:420px}
+.study-nav{display:flex;gap:12px;width:100%;max-width:420px}
+.review-grade{display:flex;gap:10px;width:100%;max-width:420px}
+.review-grade .btn{flex-direction:column;gap:2px;font-size:13px;padding:12px 6px}
+.review-grade .em{font-size:22px}
+
+.chart-card{padding:18px}.chart-card canvas{width:100%;height:auto;display:block}
+.cat-stat{display:flex;align-items:center;gap:10px;padding:12px 14px}
+.cat-stat .grow{flex:1;min-width:0}
+.cat-stat .nm{font-weight:900;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mini-bar{height:14px;border:3px solid var(--border);border-radius:999px;background:#fff;overflow:hidden;margin-top:6px}
+.mini-fill{height:100%;background:var(--accent);border-right:3px solid var(--border)}
+.cat-stat .pct{font-weight:900;font-size:15px;flex:0 0 auto}
+
+.set-list{display:flex;flex-direction:column;gap:12px}
+.set-item{padding:16px;display:flex;align-items:center;gap:12px}.set-item .grow{flex:1}
+.set-item .t{font-weight:900;font-size:16px}.set-item .d{font-size:13px;font-weight:700;color:var(--text-2)}
+.profile-card{padding:18px;display:flex;align-items:center;gap:14px;background:var(--accent)}
+.avatar{width:56px;height:56px;border:var(--bw) solid var(--border);border-radius:14px;background:var(--primary);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:24px}
+.switch{position:relative;width:56px;height:32px;flex:0 0 auto}
+.switch input{display:none}
+.switch .track{position:absolute;inset:0;border:3px solid var(--border);border-radius:999px;background:#e7e4dc;transition:background .15s}
+.switch .knob{position:absolute;top:3px;left:3px;width:20px;height:20px;border:3px solid var(--border);border-radius:50%;background:#fff;transition:transform .15s}
+.switch input:checked + .track{background:var(--accent)}
+.switch input:checked + .track .knob{transform:translateX(24px)}
+
+.bottom-nav{position:fixed;left:0;right:0;bottom:0;z-index:40;height:calc(var(--nav-h) + var(--safe-b));padding-bottom:var(--safe-b);background:var(--card);border-top:var(--bw) solid var(--border);display:flex}
+.bottom-nav .nav-inner{max-width:560px;margin:0 auto;width:100%;display:flex}
+.nav-btn{flex:1;background:none;border:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:6px 0;color:var(--text-2);font-weight:800;font-size:10px}
+.nav-btn svg{width:22px;height:22px}.nav-btn.active{color:var(--text)}
+.nav-btn.active .nav-ic{background:var(--primary);border-radius:12px;border:3px solid var(--border);padding:4px 9px}
+.nav-ic{padding:4px 9px;border:3px solid transparent;position:relative}
+.tag.n5{background:var(--accent)}.tag.n4{background:var(--primary)}.tag.ai{background:#e7e4dc}
+.nav-badge{position:absolute;top:-6px;right:-2px;min-width:18px;height:18px;padding:0 4px;background:var(--secondary);color:#fff;border:2px solid var(--border);border-radius:999px;font-size:10px;font-weight:900;display:flex;align-items:center;justify-content:center}
+
+#toasts{position:fixed;top:0;left:0;right:0;z-index:80;display:flex;flex-direction:column;gap:10px;padding:14px;max-width:560px;margin:0 auto;pointer-events:none}
+.toast{pointer-events:auto;border:var(--bw) solid var(--border);border-radius:14px;box-shadow:var(--shadow-md);background:#fff;padding:14px 16px;display:flex;align-items:center;gap:12px;font-weight:800;animation:toastIn .25s cubic-bezier(.2,.9,.3,1)}
+.toast.out{animation:toastOut .25s ease forwards}
+.toast .ic{width:34px;height:34px;border:3px solid var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex:0 0 auto}
+.toast.success{background:#e7fff7}.toast.success .ic{background:var(--accent)}
+.toast.error{background:#ffe9e9}.toast.error .ic{background:#FF4D4D;color:#fff}
+.toast.warning{background:#fff7df}.toast.warning .ic{background:var(--primary)}
+.toast.info{background:#eef1ff}.toast.info .ic{background:#7aa2ff;color:#fff}
+@keyframes toastIn{from{opacity:0;transform:translateY(-16px)}to{opacity:1;transform:none}}
+@keyframes toastOut{to{opacity:0;transform:translateY(-16px)}}
+
+.modal-back{position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center;padding:0;animation:fade .2s ease}
+.modal{width:100%;max-width:560px;background:var(--card);border:var(--bw) solid var(--border);border-top-left-radius:24px;border-top-right-radius:24px;border-bottom:none;box-shadow:0 -8px 0 0 rgba(0,0,0,.06);padding:22px 20px calc(22px + var(--safe-b));animation:sheetUp .28s cubic-bezier(.2,.9,.3,1);max-height:92vh;overflow-y:auto}
+@media(min-width:600px){.modal-back{align-items:center}.modal{border-radius:24px;border-bottom:var(--bw) solid var(--border);box-shadow:var(--shadow-lg)}}
+@keyframes sheetUp{from{transform:translateY(100%)}to{transform:none}}
+.modal h3{font-size:21px;font-weight:900;margin-bottom:6px}
+.modal p{color:var(--text-2);font-weight:700;margin-bottom:18px}
+.modal .actions{display:flex;gap:10px;margin-top:6px}
+.batch-progress{margin:8px 0 16px}
+.batch-bar{height:22px;border:3px solid var(--border);border-radius:999px;background:#fff;overflow:hidden}
+.batch-fill{height:100%;background:var(--accent);width:0;border-right:3px solid var(--border);transition:width .2s}
+.batch-count{text-align:center;font-weight:900;margin-top:8px}
+.batch-result{display:flex;gap:10px;margin-top:8px}
+.batch-result .b{flex:1;padding:14px;border:3px solid var(--border);border-radius:14px;text-align:center;font-weight:900}
+.batch-result .ok{background:#e7fff7}.batch-result .fail{background:#ffe9e9}.batch-result .skip{background:#fff7df}
+
+.overlay{position:fixed;inset:0;z-index:90;background:rgba(245,243,238,.86);backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center}
+.loader-card{padding:26px 30px;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center}
+.spinner{width:54px;height:54px;border:var(--bw) solid var(--border);border-radius:14px;background:var(--primary);animation:spin 1.1s steps(8) infinite}
+@keyframes spin{to{transform:rotate(360deg)}}.loader-card .lt{font-weight:900;font-size:16px}
+
+#boot{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;background:var(--bg)}
+#boot .logo{width:96px;height:96px;animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(.92)}}
+.install-pill{position:fixed;left:16px;right:16px;bottom:calc(var(--nav-h) + var(--safe-b) + 14px);z-index:50;max-width:528px;margin:0 auto;padding:12px 14px;display:flex;align-items:center;gap:12px;background:var(--secondary);color:#fff}
+.install-pill .grow{flex:1}.install-pill .t{font-weight:900;font-size:14px}
+</style>
+</head>
+<body>
+
+<div id="boot">
+  <svg class="logo" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <rect x="6" y="6" width="108" height="108" rx="22" fill="#FFD84D" stroke="#000" stroke-width="6"/>
+    <text x="60" y="78" text-anchor="middle" font-family="'Noto Sans JP',sans-serif" font-size="58" font-weight="900" fill="#111">日</text>
+  </svg>
+</div>
+
+<div id="app">
+
+  <!-- WELCOME -->
+  <section id="screen-welcome" class="screen">
+    <div class="page page-noNav">
+      <div class="brand">
+        <svg class="logo" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+          <rect x="6" y="6" width="108" height="108" rx="24" fill="#FFD84D" stroke="#000" stroke-width="6"/>
+          <text x="60" y="80" text-anchor="middle" font-family="'Noto Sans JP',sans-serif" font-size="60" font-weight="900" fill="#111">日</text>
+        </svg>
+        <h1>Nihongo&nbsp;Flash</h1>
+        <div class="tag-line">Belajar Bahasa Jepang Lebih Cepat.</div>
+      </div>
+      <div class="welcome-actions">
+        <button class="btn btn-primary" data-go="register">Daftar</button>
+        <button class="btn btn-ghost" data-go="login">Login</button>
+        <div class="divider">atau</div>
+        <button class="btn g-btn" id="welcome-google">
+          <svg viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.9 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 6.1 29.5 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.3-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 16 19 12 24 12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 6.1 29.5 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 10-2 13.6-5.2l-6.3-5.3C29.3 35 26.8 36 24 36c-5.3 0-9.7-3.1-11.3-7.6l-6.5 5C9.6 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.1-4 5.5l6.3 5.3C41.4 35.9 44 30.4 44 24c0-1.3-.1-2.3-.4-3.5z"/></svg>
+          Masuk dengan Google
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- REGISTER -->
+  <section id="screen-register" class="screen">
+    <div class="topbar"><button class="btn btn-icon btn-ghost" data-go="welcome">←</button><h1>Daftar</h1></div>
+    <div class="page page-noNav"><div class="auth-card nb"><div class="pad">
+      <div class="field"><label>Nama</label><input class="input" id="reg-name" type="text" autocomplete="name" placeholder="Nama lengkap"/></div>
+      <div class="field"><label>Email</label><input class="input" id="reg-email" type="email" autocomplete="email" placeholder="email@contoh.com"/></div>
+      <div class="field"><label>Password</label><input class="input" id="reg-pass" type="password" autocomplete="new-password" placeholder="Minimal 6 karakter"/></div>
+      <div class="field"><label>Konfirmasi Password</label><input class="input" id="reg-pass2" type="password" autocomplete="new-password" placeholder="Ulangi password"/></div>
+      <button class="btn btn-primary" id="reg-submit">Buat Akun</button>
+      <div class="auth-switch">Sudah punya akun? <a data-go="login">Login</a></div>
+    </div></div></div>
+  </section>
+
+  <!-- LOGIN -->
+  <section id="screen-login" class="screen">
+    <div class="topbar"><button class="btn btn-icon btn-ghost" data-go="welcome">←</button><h1>Login</h1></div>
+    <div class="page page-noNav"><div class="auth-card nb"><div class="pad">
+      <div class="field"><label>Email</label><input class="input" id="log-email" type="email" autocomplete="email" placeholder="email@contoh.com"/></div>
+      <div class="field"><label>Password</label><input class="input" id="log-pass" type="password" autocomplete="current-password" placeholder="Password"/></div>
+      <button class="btn btn-primary" id="log-submit">Masuk</button>
+      <div class="divider">atau</div>
+      <button class="btn g-btn" id="login-google">
+        <svg viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.9 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 6.1 29.5 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.3-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 16 19 12 24 12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 6.1 29.5 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 10-2 13.6-5.2l-6.3-5.3C29.3 35 26.8 36 24 36c-5.3 0-9.7-3.1-11.3-7.6l-6.5 5C9.6 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.1-4 5.5l6.3 5.3C41.4 35.9 44 30.4 44 24c0-1.3-.1-2.3-.4-3.5z"/></svg>
+        Masuk dengan Google
+      </button>
+      <div class="auth-switch">Belum punya akun? <a data-go="register">Daftar</a></div>
+    </div></div></div>
+  </section>
+
+  <!-- DASHBOARD -->
+  <section id="screen-dashboard" class="screen">
+    <div class="topbar"><h1>Dashboard</h1><div class="spacer"></div><span class="tag" id="dash-streak-tag">🔥 0</span></div>
+    <div class="page">
+      <div id="review-banner"></div>
+      <div class="hero nb">
+        <div class="hi">こんにちは 👋</div>
+        <div class="name" id="dash-name">Pelajar</div>
+        <div class="streak" id="dash-streak">🔥 0 Hari Berturut-turut</div>
+      </div>
+      <div class="stat-grid">
+        <div class="stat p1 nb"><div class="num" id="st-total">0</div><div class="lbl">Total Flashcard</div></div>
+        <div class="stat p2 nb"><div class="num" id="st-hafal">0</div><div class="lbl">Sudah Hafal</div></div>
+        <div class="stat p3 nb"><div class="num" id="st-belum">0</div><div class="lbl">Belum Hafal</div></div>
+        <div class="stat p4 nb"><div class="num" id="st-review">0</div><div class="lbl">Review Hari Ini</div></div>
+      </div>
+      <div class="progress-wrap">
+        <div class="section-title">Progress Hafalan</div>
+        <div class="progress-bar"><div class="progress-fill" id="dash-fill"></div></div>
+        <div class="progress-meta"><span id="dash-meta-l">0 hafal</span><span id="dash-meta-r">dari 0</span></div>
+      </div>
+      <div class="section-title">Menu Cepat</div>
+      <div class="btn-row"><button class="btn btn-accent" data-nav="review">🎯 Review</button><button class="btn btn-secondary" data-nav="flashcard">📚 Flashcard</button></div>
+      <div class="btn-row" style="margin-top:10px"><button class="btn btn-ghost" data-nav="category">📂 Kategori</button><button class="btn btn-ghost" data-nav="progress">📊 Progress</button></div>
+      <div class="btn-row" style="margin-top:10px"><button class="btn btn-primary" id="dash-batch">⚡ Batch Import</button></div>
+    </div>
+  </section>
+
+  <!-- CATEGORY -->
+  <section id="screen-category" class="screen">
+    <div class="topbar"><h1>Kategori</h1></div>
+    <div class="page">
+      <button class="btn btn-primary fab-add" id="cat-add-btn">+ Tambah Kategori</button>
+      <div class="list" id="cat-list"></div>
+    </div>
+  </section>
+
+  <!-- FLASHCARD MANAGER -->
+  <section id="screen-flashcard" class="screen">
+    <div class="topbar"><h1>Flashcard</h1><div class="spacer"></div><button class="btn btn-sm btn-accent" id="fc-study-btn">▶ Belajar</button></div>
+    <div class="page">
+      <div class="btn-row fab-add">
+        <button class="btn btn-primary" id="fc-add-btn">+ Tambah</button>
+        <button class="btn btn-secondary" id="fc-batch-btn">⚡ Batch</button>
+      </div>
+      <div class="toolbar"><input class="input" id="fc-search" type="search" placeholder="🔍 Cari: 食べる / たべる / makan…" /></div>
+      <div class="toolbar">
+        <select class="select" id="fc-filter"><option value="">Semua Kategori</option></select>
+        <select class="select" id="fc-status">
+          <option value="">Semua</option><option value="favorite">⭐ Favorit</option>
+          <option value="belum_hafal">Belum Hafal</option><option value="hafal">Sudah Hafal</option>
+        </select>
+        <select class="select" id="fc-sort"><option value="new">Terbaru</option><option value="az">A → Z</option><option value="status">Belum Dulu</option></select>
+      </div>
+      <div class="list" id="fc-list"></div>
+      <button class="btn btn-ghost load-more hidden" id="fc-more">Muat lebih banyak</button>
+    </div>
+  </section>
+
+  <!-- STUDY (FLIP) -->
+  <section id="screen-study" class="screen">
+    <div class="topbar"><button class="btn btn-icon btn-ghost" data-nav="flashcard">←</button><h1>Belajar</h1><div class="spacer"></div><span class="tag" id="study-cat">Semua</span></div>
+    <div class="page">
+      <div class="study-wrap" id="study-wrap">
+        <div class="study-progress" id="study-count">0 / 0</div>
+        <div class="flip" id="flip"><div class="flip-inner">
+          <div class="flip-face flip-front">
+            <button class="speak-btn" id="study-speak-f">🔊</button>
+            <div class="kanji" id="study-kanji">—</div><div class="flip-hint">Ketuk untuk membalik</div>
+          </div>
+          <div class="flip-face flip-back">
+            <button class="speak-btn" id="study-speak-b">🔊</button>
+            <div class="rd-lbl">Cara Baca</div><div class="reading" id="study-reading">—</div>
+            <div class="mn-lbl">Arti</div><div class="meaning" id="study-meaning">—</div><div class="flip-hint">Ketuk untuk membalik</div>
+          </div>
+        </div></div>
+        <div class="study-actions"><button class="btn btn-danger" id="study-belum">✗ Belum Hafal</button><button class="btn btn-accent" id="study-hafal">✓ Hafal</button></div>
+        <div class="study-nav"><button class="btn btn-ghost" id="study-prev">← Prev</button><button class="btn btn-ghost" id="study-next">Next →</button></div>
+      </div>
+      <div class="empty hidden" id="study-empty"><span class="em">🗂️</span>Belum ada flashcard di kategori ini.</div>
+    </div>
+  </section>
+
+  <!-- REVIEW (SRS) -->
+  <section id="screen-review" class="screen">
+    <div class="topbar"><button class="btn btn-icon btn-ghost" data-nav="dashboard">←</button><h1>Review</h1><div class="spacer"></div><span class="tag" id="review-left">0</span></div>
+    <div class="page">
+      <div class="study-wrap" id="review-wrap">
+        <div class="study-progress" id="review-count">0 tersisa</div>
+        <div class="flip" id="rflip"><div class="flip-inner">
+          <div class="flip-face flip-front">
+            <button class="speak-btn" id="review-speak-f">🔊</button>
+            <div class="kanji" id="review-kanji">—</div><div class="flip-hint">Tampilkan jawaban di bawah</div>
+          </div>
+          <div class="flip-face flip-back">
+            <button class="speak-btn" id="review-speak-b">🔊</button>
+            <div class="rd-lbl">Cara Baca</div><div class="reading" id="review-reading">—</div>
+            <div class="mn-lbl">Arti</div><div class="meaning" id="review-meaning">—</div>
+          </div>
+        </div></div>
+        <button class="btn btn-primary" id="review-show">Tampilkan Jawaban</button>
+        <div class="review-grade hidden" id="review-grade">
+          <button class="btn btn-danger" data-grade="sulit"><span class="em">😵</span>Sulit</button>
+          <button class="btn btn-primary" data-grade="normal"><span class="em">🙂</span>Normal</button>
+          <button class="btn btn-accent" data-grade="mudah"><span class="em">😎</span>Mudah</button>
+        </div>
+      </div>
+      <div class="empty hidden" id="review-empty"><span class="em">🎉</span>Tidak ada kartu untuk direview hari ini.<br/>Kerja bagus!</div>
+    </div>
+  </section>
+
+  <!-- NOTES -->
+  <section id="screen-notes" class="screen">
+    <div class="topbar"><h1>Catatan</h1></div>
+    <div class="page">
+      <button class="btn btn-primary fab-add" id="note-add-btn">+ Tambah Catatan</button>
+      <div class="toolbar"><input class="input" id="note-search" type="search" placeholder="🔍 Cari catatan…" /></div>
+      <div class="toolbar"><select class="select" id="note-filter"><option value="">Semua Kategori</option></select></div>
+      <div class="list" id="note-list"></div>
+    </div>
+  </section>
+
+  <!-- DICTIONARY -->
+  <section id="screen-dictionary" class="screen">
+    <div class="topbar"><h1>Kamus</h1><div class="spacer"></div><span class="tag" id="dict-count">JLPT</span></div>
+    <div class="page">
+      <div class="toolbar"><input class="input jp" id="dict-search" type="search" placeholder="🔍 Cari: 食べる / たべる / makan…" /></div>
+      <div class="toolbar">
+        <select class="select" id="dict-level"><option value="">Semua Level</option><option value="N5">N5</option><option value="N4">N4</option></select>
+      </div>
+      <div class="list" id="dict-list"></div>
+      <button class="btn btn-ghost load-more hidden" id="dict-more">Muat lebih banyak</button>
+    </div>
+  </section>
+
+  <!-- PROGRESS -->
+  <section id="screen-progress" class="screen">
+    <div class="topbar"><h1>Progress</h1></div>
+    <div class="page">
+      <div class="stat-grid">
+        <div class="stat p1 nb"><div class="num" id="pg-total">0</div><div class="lbl">Total</div></div>
+        <div class="stat p2 nb"><div class="num" id="pg-hafal">0</div><div class="lbl">Hafal</div></div>
+        <div class="stat p3 nb"><div class="num" id="pg-belum">0</div><div class="lbl">Belum</div></div>
+        <div class="stat p4 nb"><div class="num" id="pg-pct">0%</div><div class="lbl">Persentase</div></div>
+      </div>
+      <div class="section-title">Ringkasan Hafalan</div>
+      <div class="chart-card nb"><canvas id="donut" width="320" height="220"></canvas></div>
+      <div class="section-title">Distribusi SRS</div>
+      <div class="chart-card nb"><canvas id="srs-chart" width="320" height="200"></canvas></div>
+      <div class="section-title">Per Kategori</div>
+      <div class="list" id="pg-cats"></div>
+    </div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section id="screen-settings" class="screen">
+    <div class="topbar"><h1>Pengaturan</h1></div>
+    <div class="page">
+      <div class="profile-card nb"><div class="avatar" id="set-avatar">P</div>
+        <div class="grow"><div class="t" id="set-name" style="font-weight:900;font-size:18px">Pelajar</div>
+        <div class="d" id="set-email" style="font-weight:700;color:#04231d">email@contoh.com</div></div></div>
+      <div class="section-title">Audio</div>
+      <div class="set-item nb">
+        <div class="grow"><div class="t">Auto Play Audio</div><div class="d">Putar otomatis saat kartu dibalik</div></div>
+        <label class="switch"><input type="checkbox" id="set-autoplay"/><span class="track"><span class="knob"></span></span></label>
+      </div>
+      <div class="section-title">Data</div>
+      <div class="set-list">
+        <div class="set-item nb"><div class="grow"><div class="t">Export JSON</div><div class="d">Backup seluruh data</div></div><button class="btn btn-sm btn-accent" id="btn-export">Export</button></div>
+        <div class="set-item nb"><div class="grow"><div class="t">Import JSON</div><div class="d">Restore dari backup</div></div><button class="btn btn-sm btn-primary" id="btn-import">Import</button><input type="file" id="import-file" accept="application/json,.json" class="hidden" /></div>
+      </div>
+      <div class="section-title">Akun</div>
+      <div class="set-item nb"><div class="grow"><div class="t">Logout</div><div class="d">Keluar dari akun ini</div></div><button class="btn btn-sm btn-danger" id="btn-logout">Logout</button></div>
+      <div class="section-title">Tentang</div>
+      <div class="set-item nb"><div class="grow"><div class="t">Nihongo Flash</div><div class="d">v2.0.0 — Belajar Bahasa Jepang Lebih Cepat.</div></div></div>
+    </div>
+  </section>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav hidden" id="bottom-nav"><div class="nav-inner">
+    <button class="nav-btn" data-nav="dashboard"><span class="nav-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg></span><span>Home</span></button>
+    <button class="nav-btn" data-nav="flashcard"><span class="nav-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/></svg></span><span>Flashcard</span></button>
+    <button class="nav-btn" data-nav="review"><span class="nav-ic" id="nav-review-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></span><span>Review</span></button>
+    <button class="nav-btn" data-nav="dictionary"><span class="nav-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h13v18H6a2 2 0 0 1-2-2z"/><path d="M9 3v18"/></svg></span><span>Kamus</span></button>
+    <button class="nav-btn" data-nav="notes"><span class="nav-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h12l4 4v12H4z"/><path d="M8 9h8M8 13h8M8 17h5"/></svg></span><span>Catatan</span></button>
+    <button class="nav-btn" data-nav="settings"><span class="nav-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1.3l2-1.5-2-3.4-2.3 1a7 7 0 0 0-2.3-1.3L13.8 2h-4l-.3 2.5a7 7 0 0 0-2.3 1.3l-2.3-1-2 3.4 2 1.5A7 7 0 0 0 5 12a7 7 0 0 0 .1 1.3l-2 1.5 2 3.4 2.3-1a7 7 0 0 0 2.3 1.3l.3 2.5h4l.3-2.5a7 7 0 0 0 2.3-1.3l2.3 1 2-3.4-2-1.5A7 7 0 0 0 19 12z"/></svg></span><span>Setelan</span></button>
+  </div></nav>
+</div>
+
+<div id="toasts"></div>
+<div id="modal-root"></div>
+<div id="overlay-root"></div>
+<div id="install-root"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* ============================ CONFIG ============================ */
+const CONFIG = {
+  SUPABASE_URL:      'https://upecfwgmpmkksgemhmeu.supabase.co',
+  SUPABASE_ANON_KEY: 'sb_publishable_J-5H76Dnk2t3qXHyX8VDbw_wLCQSSCK',
+  API_URL:           'https://nihongflash.vercel.app/api/japanese'
+};
+
+/* SRS schedule: hari berdasarkan level */
+const SRS_DAYS = [0, 1, 3, 7, 14, 30, 60];
+
+const sb = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY, {
+  auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+});
+
+const State = {
+  user:null, profile:null, categories:[], flashcards:[], notes:[],
+  study:{ list:[], idx:0, flipped:false },
+  review:{ list:[], idx:0, shown:false },
+  fcLimit:60,
+  dictLimit:50, dictResults:[],
+  autoplay: localStorage.getItem('nf_autoplay')==='1'
+};
+
+/* ============================ HELPERS ============================ */
+const $  = (s,r=document)=>r.querySelector(s);
+const $$ = (s,r=document)=>[...r.querySelectorAll(s)];
+const esc = s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const todayStr = ()=> new Date().toISOString().slice(0,10);
+function addDays(n){ const d=new Date(); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); }
+function daysBetween(a,b){ return Math.round((new Date(b)-new Date(a))/86400000); }
+
+function show(screen){ $$('.screen').forEach(s=>s.classList.remove('active')); const el=$('#screen-'+screen); if(el)el.classList.add('active'); window.scrollTo(0,0); }
+function setNavVisible(v){ $('#bottom-nav').classList.toggle('hidden',!v); }
+function setActiveNav(screen){ $$('.nav-btn').forEach(b=>b.classList.toggle('active', b.dataset.nav===screen)); }
+
+/* ---------- KANA → ROMAJI (untuk smart search) ---------- */
+const KANA = {
+'あ':'a','い':'i','う':'u','え':'e','お':'o','か':'ka','き':'ki','く':'ku','け':'ke','こ':'ko',
+'が':'ga','ぎ':'gi','ぐ':'gu','げ':'ge','ご':'go','さ':'sa','し':'shi','す':'su','せ':'se','そ':'so',
+'ざ':'za','じ':'ji','ず':'zu','ぜ':'ze','ぞ':'zo','た':'ta','ち':'chi','つ':'tsu','て':'te','と':'to',
+'だ':'da','ぢ':'ji','づ':'zu','で':'de','ど':'do','な':'na','に':'ni','ぬ':'nu','ね':'ne','の':'no',
+'は':'ha','ひ':'hi','ふ':'fu','へ':'he','ほ':'ho','ば':'ba','び':'bi','ぶ':'bu','べ':'be','ぼ':'bo',
+'ぱ':'pa','ぴ':'pi','ぷ':'pu','ぺ':'pe','ぽ':'po','ま':'ma','み':'mi','む':'mu','め':'me','も':'mo',
+'や':'ya','ゆ':'yu','よ':'yo','ら':'ra','り':'ri','る':'ru','れ':'re','ろ':'ro',
+'わ':'wa','を':'o','ん':'n','ー':'-',
+'きゃ':'kya','きゅ':'kyu','きょ':'kyo','しゃ':'sha','しゅ':'shu','しょ':'sho','ちゃ':'cha','ちゅ':'chu','ちょ':'cho',
+'にゃ':'nya','にゅ':'nyu','にょ':'nyo','ひゃ':'hya','ひゅ':'hyu','ひょ':'hyo','みゃ':'mya','みゅ':'myu','みょ':'myo',
+'りゃ':'rya','りゅ':'ryu','りょ':'ryo','ぎゃ':'gya','ぎゅ':'gyu','ぎょ':'gyo','じゃ':'ja','じゅ':'ju','じょ':'jo','びゃ':'bya','びゅ':'byu','びょ':'byo','ぴゃ':'pya','ぴゅ':'pyu','ぴょ':'pyo'
+};
+function kataToHira(s){ return s.replace(/[\u30a1-\u30f6]/g, c=>String.fromCharCode(c.charCodeAt(0)-0x60)); }
+function toRomaji(input){
+  let s = kataToHira(input||''); let out=''; let i=0;
+  while(i<s.length){
+    const two = s.substr(i,2);
+    if(KANA[two]){ out+=KANA[two]; i+=2; continue; }
+    const ch = s[i];
+    if(ch==='っ' || ch==='ッ'){ const nx=KANA[s.substr(i+1,2)]||KANA[s[i+1]]; if(nx){ out+=nx[0]; } i++; continue; }
+    out += (KANA[ch]!==undefined?KANA[ch]:ch); i++;
+  }
+  return out.toLowerCase();
+}
+
+/* ---------- AUDIO (Web Speech API) ---------- */
+const Speech = {
+  ok: ('speechSynthesis' in window),
+  voice: null,
+  init(){ if(!this.ok) return; const pick=()=>{ const vs=speechSynthesis.getVoices(); this.voice = vs.find(v=>v.lang==='ja-JP') || vs.find(v=>v.lang&&v.lang.startsWith('ja')) || null; }; pick(); speechSynthesis.onvoiceschanged=pick; },
+  speak(text){
+    if(!this.ok){ toast('Voice Jepang tidak tersedia','warning'); return; }
+    try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(text); u.lang='ja-JP'; if(this.voice)u.voice=this.voice; u.rate=.9; speechSynthesis.speak(u); }
+    catch(e){ toast('Voice Jepang tidak tersedia','warning'); }
+  }
+};
+
+/* ---------- TOAST / MODAL / OVERLAY ---------- */
+function toast(msg,type='info',ms=2600){
+  const icons={success:'✓',error:'✕',warning:'!',info:'i'};
+  const el=document.createElement('div'); el.className='toast '+type;
+  el.innerHTML=`<div class="ic">${icons[type]||'i'}</div><div>${esc(msg)}</div>`;
+  $('#toasts').appendChild(el); setTimeout(()=>{el.classList.add('out');setTimeout(()=>el.remove(),250);},ms);
+}
+function modal({title,body='',confirmText='OK',cancelText='Batal',danger=false,onConfirm}){
+  return new Promise(resolve=>{
+    const root=$('#modal-root');
+    root.innerHTML=`<div class="modal-back"><div class="modal nb"><h3>${esc(title)}</h3>${body?`<div>${body}</div>`:''}
+      <div class="actions"><button class="btn btn-ghost" data-act="cancel">${esc(cancelText)}</button><button class="btn ${danger?'btn-danger':'btn-primary'}" data-act="ok">${esc(confirmText)}</button></div></div></div>`;
+    const close=v=>{root.innerHTML='';resolve(v);};
+    $('.modal-back',root).addEventListener('click',e=>{if(e.target.classList.contains('modal-back'))close(false);});
+    $('[data-act="cancel"]',root).onclick=()=>close(false);
+    $('[data-act="ok"]',root).onclick=async()=>{ if(onConfirm){const r=await onConfirm(root); if(r===false)return;} close(true); };
+  });
+}
+function overlay(t){ $('#overlay-root').innerHTML=`<div class="overlay"><div class="loader-card nb"><div class="spinner"></div><div class="lt">${esc(t)}</div></div></div>`; }
+function overlayOff(){ $('#overlay-root').innerHTML=''; }
+
+/* ============================ AUTH ============================ */
+async function doRegister(){
+  const name=$('#reg-name').value.trim(), email=$('#reg-email').value.trim(), pass=$('#reg-pass').value, pass2=$('#reg-pass2').value;
+  if(!name)return toast('Nama wajib diisi','warning'); if(!email)return toast('Email wajib diisi','warning');
+  if(pass.length<6)return toast('Password minimal 6 karakter','warning'); if(pass!==pass2)return toast('Konfirmasi password tidak cocok','error');
+  overlay('Membuat akun…');
+  const {data,error}=await sb.auth.signUp({email,password:pass,options:{data:{name}}});
+  overlayOff(); if(error)return toast(error.message,'error',4000);
+  if(data.session){ toast('Akun dibuat! 🎉','success'); await afterLogin(data.session.user); }
+  else { const {data:d2,error:e2}=await sb.auth.signInWithPassword({email,password:pass}); if(e2)return toast('Akun dibuat. Silakan login.','info'); await afterLogin(d2.user); }
+}
+async function doLogin(){
+  const email=$('#log-email').value.trim(), pass=$('#log-pass').value;
+  if(!email||!pass)return toast('Email & password wajib diisi','warning');
+  overlay('Masuk…'); const {data,error}=await sb.auth.signInWithPassword({email,password:pass});
+  overlayOff(); if(error)return toast(error.message,'error',4000); toast('Berhasil masuk','success'); await afterLogin(data.user);
+}
+async function doGoogle(){ const {error}=await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.origin+window.location.pathname}}); if(error)toast(error.message,'error',4000); }
+async function doLogout(){
+  const ok=await modal({title:'Logout?',body:'<p>Anda akan keluar dari akun ini.</p>',confirmText:'Logout',danger:true}); if(!ok)return;
+  await sb.auth.signOut(); State.user=State.profile=null; State.categories=[];State.flashcards=[];State.notes=[];
+  setNavVisible(false); show('welcome'); toast('Anda telah logout','info');
+}
+async function ensureProfile(user){
+  const {data}=await sb.from('profiles').select('*').eq('id',user.id).maybeSingle();
+  if(data){State.profile=data;return;}
+  const name=user.user_metadata?.name||user.user_metadata?.full_name||(user.email||'').split('@')[0];
+  const {data:ins}=await sb.from('profiles').upsert({id:user.id,name}).select().maybeSingle();
+  State.profile=ins||{id:user.id,name,streak:0,last_review_date:null};
+}
+async function afterLogin(user){
+  State.user=user; overlay('Memuat data…'); await ensureProfile(user); await loadAll(); overlayOff();
+  setNavVisible(true); goto('dashboard');
+}
+
+/* ============================ DATA ============================ */
+async function loadCategories(){ const {data,error}=await sb.from('categories').select('*').order('created_at',{ascending:true}); if(!error)State.categories=data||[]; }
+async function loadFlashcards(){ const {data,error}=await sb.from('flashcards').select('*').order('created_at',{ascending:false}); if(!error)State.flashcards=data||[]; }
+async function loadNotes(){ const {data,error}=await sb.from('notes').select('*').order('updated_at',{ascending:false}); if(!error)State.notes=data||[]; }
+async function loadAll(){ await Promise.all([loadCategories(),loadFlashcards(),loadNotes()]); }
+
+async function createCategory(name){ const {data,error}=await sb.from('categories').insert({user_id:State.user.id,name}).select().single(); if(error){toast('Gagal menambah kategori','error');return null;} State.categories.push(data); return data; }
+async function updateCategory(id,name){ const {error}=await sb.from('categories').update({name}).eq('id',id); if(error){toast('Gagal mengubah kategori','error');return;} const c=State.categories.find(x=>x.id===id); if(c)c.name=name; }
+async function deleteCategory(id){ const {error}=await sb.from('categories').delete().eq('id',id); if(error){toast('Gagal menghapus kategori','error');return;} State.categories=State.categories.filter(c=>c.id!==id); State.flashcards=State.flashcards.filter(f=>f.category_id!==id); }
+
+async function createFlashcard(o){ const {data,error}=await sb.from('flashcards').insert({user_id:State.user.id,category_id:o.category_id,kanji:o.kanji,reading:o.reading,meaning:o.meaning,status:'belum_hafal',favorite:false,review_level:0,next_review_date:todayStr(),review_count:0}).select().single(); if(error){toast('Gagal menyimpan flashcard','error');return null;} State.flashcards.unshift(data); return data; }
+async function updateFlashcard(id,patch){ const {error}=await sb.from('flashcards').update(patch).eq('id',id); if(error){toast('Gagal memperbarui','error');return;} const f=State.flashcards.find(x=>x.id===id); if(f)Object.assign(f,patch); }
+async function deleteFlashcard(id){ const {error}=await sb.from('flashcards').delete().eq('id',id); if(error){toast('Gagal menghapus','error');return;} State.flashcards=State.flashcards.filter(f=>f.id!==id); }
+
+async function createNote(o){ const {data,error}=await sb.from('notes').insert({user_id:State.user.id,category_id:o.category_id||null,title:o.title,content:o.content}).select().single(); if(error){toast('Gagal menyimpan catatan','error');return null;} State.notes.unshift(data); return data; }
+async function updateNote(id,patch){ const {error}=await sb.from('notes').update(patch).eq('id',id); if(error){toast('Gagal memperbarui catatan','error');return;} const n=State.notes.find(x=>x.id===id); if(n)Object.assign(n,patch); }
+async function deleteNote(id){ const {error}=await sb.from('notes').delete().eq('id',id); if(error){toast('Gagal menghapus catatan','error');return;} State.notes=State.notes.filter(n=>n.id!==id); }
+
+async function saveStreak(){ if(!State.profile)return; await sb.from('profiles').update({streak:State.profile.streak,last_review_date:State.profile.last_review_date}).eq('id',State.user.id); }
+
+/* ============================ AI ============================ */
+async function fetchJapanese(word){
+  const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(),20000);
+  try{
+    const res=await fetch(CONFIG.API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({word}),signal:ctrl.signal});
+    clearTimeout(t); const data=await res.json().catch(()=>null);
+    if(!res.ok||!data)throw new Error((data&&data.error)||'Gagal memanggil AI');
+    if(!data.reading||!data.meaning)throw new Error('Respons AI tidak lengkap');
+    return {reading:String(data.reading).trim(),meaning:String(data.meaning).trim()};
+  }catch(err){ clearTimeout(t); if(err.name==='AbortError')throw new Error('Permintaan AI timeout'); throw err; }
+}
+
+/* ============================ STATS ============================ */
+function stats(){ const total=State.flashcards.length; const hafal=State.flashcards.filter(f=>f.status==='hafal').length; const belum=total-hafal; const pct=total?Math.round(hafal/total*100):0; return {total,hafal,belum,pct}; }
+function dueCards(){ const t=todayStr(); return State.flashcards.filter(f=>(f.next_review_date||t)<=t); }
+function effectiveStreak(){ const p=State.profile; if(!p||!p.last_review_date)return 0; const d=daysBetween(p.last_review_date,todayStr()); return d<=1 ? (p.streak||0) : 0; }
+
+/* ============================ DASHBOARD ============================ */
+function renderDashboard(){
+  const {total,hafal,belum,pct}=stats(); const due=dueCards().length; const streak=effectiveStreak();
+  $('#dash-name').textContent=State.profile?.name||'Pelajar';
+  $('#st-total').textContent=total; $('#st-hafal').textContent=hafal; $('#st-belum').textContent=belum; $('#st-review').textContent=due;
+  $('#dash-fill').style.width=pct+'%'; $('#dash-meta-l').textContent=hafal+' hafal'; $('#dash-meta-r').textContent='dari '+total;
+  $('#dash-streak').textContent=`🔥 ${streak} Hari Berturut-turut`; $('#dash-streak-tag').textContent=`🔥 ${streak}`;
+  const banner=$('#review-banner');
+  banner.innerHTML = due>0 ? `<div class="banner nb"><div class="grow"><div class="bt">📚 Anda memiliki ${due} kartu untuk direview hari ini.</div></div><button class="btn btn-sm" id="banner-review">Mulai Review</button></div>` : '';
+  if(due>0) $('#banner-review').onclick=()=>goto('review');
+  const navBadge=$('#nav-review-ic'); let b=navBadge.querySelector('.nav-badge'); if(due>0){ if(!b){b=document.createElement('span');b.className='nav-badge';navBadge.appendChild(b);} b.textContent=due>99?'99+':due; } else if(b){ b.remove(); }
+}
+
+/* ============================ CATEGORY ============================ */
+function countFor(catId){ return State.flashcards.filter(f=>f.category_id===catId).length; }
+function renderCategory(){
+  const list=$('#cat-list');
+  if(!State.categories.length){ list.innerHTML=`<div class="empty nb"><span class="em">📂</span>Belum ada kategori.</div>`; return; }
+  list.innerHTML=State.categories.map(c=>`<div class="row-card nb"><div class="grow"><div class="title">${esc(c.name)}</div><div class="sub">${countFor(c.id)} flashcard</div></div>
+    <button class="btn btn-mini btn-ghost" data-edit-cat="${c.id}">✎</button><button class="btn btn-mini btn-danger" data-del-cat="${c.id}">🗑</button></div>`).join('');
+  $$('[data-edit-cat]',list).forEach(b=>b.onclick=()=>categoryForm(b.dataset.editCat));
+  $$('[data-del-cat]',list).forEach(b=>b.onclick=()=>confirmDeleteCategory(b.dataset.delCat));
+}
+async function categoryForm(id){
+  const editing=State.categories.find(c=>c.id===id);
+  const ok=await modal({title:editing?'Edit Kategori':'Tambah Kategori',
+    body:`<div class="field"><label>Nama Kategori</label><input class="input" id="m-cat-name" value="${esc(editing?editing.name:'')}" placeholder="Mis. N5, Kata Kerja…"/></div>`,
+    confirmText:editing?'Simpan':'Tambah',
+    onConfirm:async()=>{ const name=$('#m-cat-name').value.trim(); if(!name){toast('Nama tidak boleh kosong','warning');return false;} if(editing)await updateCategory(id,name); else await createCategory(name); }});
+  if(ok){ toast(editing?'Kategori diperbarui':'Kategori ditambahkan','success'); renderCategory(); refreshFilters(); }
+}
+async function confirmDeleteCategory(id){
+  const c=State.categories.find(x=>x.id===id); const n=countFor(id);
+  const ok=await modal({title:'Hapus Kategori?',body:`<p>"${esc(c.name)}" beserta <b>${n} flashcard</b> akan dihapus permanen.</p>`,confirmText:'Hapus',danger:true});
+  if(!ok)return; await deleteCategory(id); toast('Kategori dihapus','success'); renderCategory(); refreshFilters();
+}
+
+/* ============================ FLASHCARD MANAGER ============================ */
+function catName(id){ const c=State.categories.find(x=>x.id===id); return c?c.name:'—'; }
+function matchSearch(f,q){
+  if(!q)return true;
+  const hay=[ (f.kanji||''), (f.reading||''), (f.meaning||'').toLowerCase(), toRomaji(f.reading||''), toRomaji(f.kanji||'') ].join(' ').toLowerCase();
+  return hay.includes(q) || toRomaji(q).length && hay.includes(toRomaji(q));
+}
+function visibleFlashcards(){
+  const q=$('#fc-search').value.trim().toLowerCase();
+  const filter=$('#fc-filter').value, status=$('#fc-status').value, sort=$('#fc-sort').value;
+  let arr=State.flashcards.slice();
+  if(filter)arr=arr.filter(f=>f.category_id===filter);
+  if(status==='favorite')arr=arr.filter(f=>f.favorite);
+  else if(status==='hafal')arr=arr.filter(f=>f.status==='hafal');
+  else if(status==='belum_hafal')arr=arr.filter(f=>f.status!=='hafal');
+  if(q)arr=arr.filter(f=>matchSearch(f,q));
+  if(sort==='az')arr.sort((a,b)=>(a.kanji||'').localeCompare(b.kanji||'','ja'));
+  else if(sort==='status')arr.sort((a,b)=>(a.status==='hafal'?1:0)-(b.status==='hafal'?1:0));
+  else arr.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+  return arr;
+}
+function renderFlashcards(){
+  const list=$('#fc-list'); const all=visibleFlashcards(); const arr=all.slice(0,State.fcLimit);
+  if(!all.length){ list.innerHTML=`<div class="empty nb"><span class="em">🃏</span>Tidak ada flashcard.</div>`; $('#fc-more').classList.add('hidden'); return; }
+  list.innerHTML=arr.map(f=>`<div class="row-card nb jp"><div class="grow"><div class="title">${esc(f.kanji)}</div>
+    <div class="sub">${esc(f.reading||'…')} · ${esc(f.meaning||'…')}</div>
+    <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap"><span class="tag gray">${esc(catName(f.category_id))}</span><span class="tag ${f.status==='hafal'?'green':''}">${f.status==='hafal'?'✓ Hafal':'Belum'}</span></div></div>
+    <div class="card-actions">
+      <button class="btn btn-mini btn-ghost" data-spk="${f.id}">🔊</button>
+      <button class="btn btn-mini btn-ghost" data-fav="${f.id}"><span class="star ${f.favorite?'on':''}">⭐</span></button>
+      <button class="btn btn-mini btn-ghost" data-edit-fc="${f.id}">✎</button>
+      <button class="btn btn-mini btn-danger" data-del-fc="${f.id}">🗑</button>
+    </div></div>`).join('');
+  $('#fc-more').classList.toggle('hidden', all.length<=State.fcLimit);
+  $$('[data-spk]',list).forEach(b=>b.onclick=()=>{ const f=State.flashcards.find(x=>x.id===b.dataset.spk); if(f)Speech.speak(f.kanji); });
+  $$('[data-fav]',list).forEach(b=>b.onclick=()=>toggleFav(b.dataset.fav));
+  $$('[data-edit-fc]',list).forEach(b=>b.onclick=()=>editFlashcardForm(b.dataset.editFc));
+  $$('[data-del-fc]',list).forEach(b=>b.onclick=()=>confirmDeleteFlashcard(b.dataset.delFc));
+}
+async function toggleFav(id){ const f=State.flashcards.find(x=>x.id===id); if(!f)return; const nv=!f.favorite; f.favorite=nv; await updateFlashcard(id,{favorite:nv}); renderFlashcards(); }
+
+async function addFlashcardForm(presetCat){
+  if(!State.categories.length){ toast('Buat kategori terlebih dahulu','warning'); goto('category'); return; }
+  const opts=State.categories.map(c=>`<option value="${c.id}" ${c.id===presetCat?'selected':''}>${esc(c.name)}</option>`).join('');
+  const root=$('#modal-root');
+  root.innerHTML=`<div class="modal-back"><div class="modal nb"><h3>Tambah Flashcard</h3><p>AI mengisi cara baca & arti otomatis.</p>
+    <div class="field"><label>Kategori</label><select class="select" id="m-fc-cat" style="width:100%">${opts}</select></div>
+    <div class="field"><label>Kanji / Kosakata Jepang</label><input class="input jp" id="m-fc-word" placeholder="Mis. 食べる"/></div>
+    <div class="actions"><button class="btn btn-ghost" id="m-fc-cancel">Batal</button><button class="btn btn-primary" id="m-fc-save">Simpan</button></div></div></div>`;
+  const close=()=>root.innerHTML='';
+  $('.modal-back',root).addEventListener('click',e=>{if(e.target.classList.contains('modal-back'))close();});
+  $('#m-fc-cancel').onclick=close;
+  $('#m-fc-save').onclick=async()=>{
+    const category_id=$('#m-fc-cat').value, word=$('#m-fc-word').value.trim();
+    if(!word){toast('Masukkan kata Jepang','warning');return;}
+    close(); overlay('Sedang membuat flashcard…');
+    try{
+      let reading, meaning;
+      const dict=await lookupDictionary(word);            // 1) cek dictionary dulu
+      if(dict){ reading=dict.reading; meaning=dict.meaning; }
+      else { const r=await fetchJapanese(word); reading=r.reading; meaning=r.meaning; } // 2) fallback AI (+auto simpan ke dict di backend)
+      const card=await createFlashcard({category_id,kanji:word,reading,meaning}); overlayOff();
+      if(card){toast(dict?'Dari kamus 📖':'Flashcard dibuat 🎉','success'); refreshAll();}
+    }
+    catch(err){ overlayOff(); toast(err.message||'Gagal','error',4000); manualFallback(category_id,word); }
+  };
+}
+async function manualFallback(category_id,word){
+  const ok=await modal({title:'AI tidak tersedia',body:`<p>Isi manual untuk "${esc(word)}".</p>
+    <div class="field"><label>Cara Baca (hiragana)</label><input class="input jp" id="mf-read" placeholder="たべる"/></div>
+    <div class="field"><label>Arti</label><input class="input" id="mf-mean" placeholder="Makan"/></div>`,confirmText:'Simpan',
+    onConfirm:async()=>{ const reading=$('#mf-read').value.trim(),meaning=$('#mf-mean').value.trim(); if(!reading||!meaning){toast('Lengkapi cara baca & arti','warning');return false;} const c=await createFlashcard({category_id,kanji:word,reading,meaning}); if(!c)return false; }});
+  if(ok){ toast('Flashcard disimpan','success'); refreshAll(); }
+}
+async function editFlashcardForm(id){
+  const f=State.flashcards.find(x=>x.id===id); if(!f)return;
+  const opts=State.categories.map(c=>`<option value="${c.id}" ${c.id===f.category_id?'selected':''}>${esc(c.name)}</option>`).join('');
+  const ok=await modal({title:'Edit Flashcard',
+    body:`<div class="field"><label>Kategori</label><select class="select" id="m-ef-cat" style="width:100%">${opts}</select></div>
+      <div class="field"><label>Kanji / Kosakata</label><input class="input jp" id="m-ef-kanji" value="${esc(f.kanji)}"/></div>
+      <div class="field"><label>Cara Baca</label><input class="input jp" id="m-ef-read" value="${esc(f.reading||'')}"/></div>
+      <div class="field"><label>Arti</label><input class="input" id="m-ef-mean" value="${esc(f.meaning||'')}"/></div>`,confirmText:'Simpan',
+    onConfirm:async()=>{ const kanji=$('#m-ef-kanji').value.trim(); if(!kanji){toast('Kanji tidak boleh kosong','warning');return false;}
+      await updateFlashcard(id,{category_id:$('#m-ef-cat').value,kanji,reading:$('#m-ef-read').value.trim(),meaning:$('#m-ef-mean').value.trim()}); }});
+  if(ok){ toast('Flashcard diperbarui','success'); refreshAll(); }
+}
+async function confirmDeleteFlashcard(id){
+  const f=State.flashcards.find(x=>x.id===id);
+  const ok=await modal({title:'Hapus Flashcard?',body:`<p>"${esc(f.kanji)}" akan dihapus permanen.</p>`,confirmText:'Hapus',danger:true});
+  if(!ok)return; await deleteFlashcard(id); toast('Flashcard dihapus','success'); refreshAll();
+}
+function refreshFilters(){
+  const opts=`<option value="">Semua Kategori</option>`+State.categories.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');
+  const sel=$('#fc-filter'),cur=sel.value; sel.innerHTML=opts; sel.value=State.categories.some(c=>c.id===cur)?cur:'';
+  const ns=$('#note-filter'),nc=ns.value; ns.innerHTML=opts; ns.value=State.categories.some(c=>c.id===nc)?nc:'';
+}
+
+/* ============================ BATCH IMPORT ============================ */
+function batchImportForm(){
+  if(!State.categories.length){ toast('Buat kategori terlebih dahulu','warning'); goto('category'); return; }
+  const opts=State.categories.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');
+  const root=$('#modal-root');
+  root.innerHTML=`<div class="modal-back"><div class="modal nb"><h3>⚡ Batch Import</h3><p>Tempel banyak kata, satu per baris. AI akan memproses semuanya.</p>
+    <div class="field"><label>Kategori</label><select class="select" id="b-cat" style="width:100%">${opts}</select></div>
+    <div class="field"><label>Daftar Kata Jepang</label><textarea class="textarea jp" id="b-words" placeholder="食べる&#10;飲む&#10;行く&#10;見る&#10;買う"></textarea></div>
+    <div class="set-item" style="padding:12px;border:3px solid #000;border-radius:12px;margin-bottom:14px"><div class="grow"><div class="t" style="font-size:14px">Lewati kata yang sudah ada</div></div>
+      <label class="switch"><input type="checkbox" id="b-skip" checked/><span class="track"><span class="knob"></span></span></label></div>
+    <div class="actions"><button class="btn btn-ghost" id="b-cancel">Batal</button><button class="btn btn-primary" id="b-go">Generate Flashcards</button></div></div></div>`;
+  const close=()=>root.innerHTML='';
+  $('.modal-back',root).addEventListener('click',e=>{if(e.target.classList.contains('modal-back'))close();});
+  $('#b-cancel').onclick=close;
+  $('#b-go').onclick=()=>runBatch($('#b-cat').value, $('#b-words').value, $('#b-skip').checked, root);
+}
+async function runBatch(category_id, raw, skipExisting, root){
+  let words=raw.split('\n').map(w=>w.trim()).filter(Boolean);
+  words=[...new Set(words)]; // hapus duplikat dalam paste
+  if(skipExisting){
+    const existing=new Set(State.flashcards.filter(f=>f.category_id===category_id).map(f=>f.kanji));
+    var skipped=words.filter(w=>existing.has(w)).length;
+    words=words.filter(w=>!existing.has(w));
+  } else { var skipped=0; }
+  if(!words.length){ toast('Tidak ada kata baru untuk diproses','warning'); return; }
+  const total=words.length;
+  $('.modal h3',root).textContent='⚡ Memproses…';
+  $('.modal p',root).textContent='Mohon jangan tutup halaman ini.';
+  const formArea=$('#b-cat',root).closest('.modal');
+  formArea.querySelectorAll('.field,.set-item,.actions').forEach(e=>e.remove());
+  const prog=document.createElement('div'); prog.className='batch-progress';
+  prog.innerHTML=`<div class="batch-bar"><div class="batch-fill" id="b-fill"></div></div><div class="batch-count" id="b-count">0 / ${total}</div>`;
+  formArea.appendChild(prog);
+  let ok=0, fail=0; const rows=[];
+  const dictMap=await lookupDictionaryMany(words);   // cek dictionary sekaligus
+  for(let i=0;i<total;i++){
+    $('#b-count').textContent=`${i+1} / ${total}`;
+    $('#b-fill').style.width=Math.round((i+1)/total*100)+'%';
+    const w=words[i]; const hit=dictMap[w];
+    if(hit){ rows.push({user_id:State.user.id,category_id,kanji:w,reading:hit.reading,meaning:hit.meaning,status:'belum_hafal',favorite:false,review_level:0,next_review_date:todayStr(),review_count:0}); ok++; continue; }
+    try{ const {reading,meaning}=await fetchJapanese(w); rows.push({user_id:State.user.id,category_id,kanji:w,reading,meaning,status:'belum_hafal',favorite:false,review_level:0,next_review_date:todayStr(),review_count:0}); ok++; }
+    catch(e){ fail++; }
+  }
+  if(rows.length){ const {data,error}=await sb.from('flashcards').insert(rows).select(); if(!error&&data)State.flashcards=data.concat(State.flashcards); else if(error){ok=0;fail=total;toast('Gagal menyimpan ke database','error');} }
+  const res=document.createElement('div');
+  res.innerHTML=`<div class="batch-result"><div class="b ok">Berhasil<br>${ok}</div><div class="b fail">Gagal<br>${fail}</div><div class="b skip">Dilewati<br>${skipped}</div></div>
+    <div class="actions" style="margin-top:14px"><button class="btn btn-primary" id="b-done">Selesai</button></div>`;
+  formArea.appendChild(res);
+  $('#b-done').onclick=()=>{ root.innerHTML=''; toast(`Selesai: ${ok} berhasil`,'success'); refreshAll(); };
+}
+
+/* ============================ STUDY (FLIP) ============================ */
+function startStudy(){
+  const filter=$('#fc-filter').value, status=$('#fc-status').value;
+  let list=State.flashcards.slice();
+  if(filter)list=list.filter(f=>f.category_id===filter);
+  if(status==='favorite')list=list.filter(f=>f.favorite);
+  else if(status==='hafal')list=list.filter(f=>f.status==='hafal');
+  else if(status==='belum_hafal')list=list.filter(f=>f.status!=='hafal');
+  list.sort((a,b)=>(a.status==='hafal'?1:0)-(b.status==='hafal'?1:0));
+  State.study={list,idx:0,flipped:false};
+  $('#study-cat').textContent=filter?catName(filter):'Semua';
+  goto('study');
+}
+function renderStudy(){
+  const {list,idx}=State.study; const empty=$('#study-empty'),wrap=$('#study-wrap');
+  if(!list.length){empty.classList.remove('hidden');wrap.classList.add('hidden');return;}
+  empty.classList.add('hidden');wrap.classList.remove('hidden');
+  const f=list[idx]; $('#flip').classList.remove('flipped'); State.study.flipped=false;
+  $('#study-kanji').textContent=f.kanji; $('#study-reading').textContent=f.reading||'—'; $('#study-meaning').textContent=f.meaning||'—';
+  $('#study-count').textContent=`${idx+1} / ${list.length}`;
+  $('#study-hafal').style.opacity=f.status==='hafal'?'1':'.65'; $('#study-belum').style.opacity=f.status==='hafal'?'.65':'1';
+}
+function flipStudy(){ State.study.flipped=!State.study.flipped; $('#flip').classList.toggle('flipped',State.study.flipped); if(State.study.flipped&&State.autoplay){const f=State.study.list[State.study.idx]; if(f)Speech.speak(f.kanji);} }
+function studyMove(d){ const n=State.study.list.length; if(!n)return; State.study.idx=(State.study.idx+d+n)%n; renderStudy(); }
+async function studySetStatus(status){
+  const f=State.study.list[State.study.idx]; if(!f)return;
+  if(f.status!==status){ f.status=status; await updateFlashcard(f.id,{status}); }
+  toast(status==='hafal'?'Ditandai hafal ✓':'Ditandai belum hafal','success',1200);
+  renderStudy(); setTimeout(()=>studyMove(1),300);
+}
+
+/* ============================ REVIEW (SRS) ============================ */
+function startReview(){
+  let list=dueCards();
+  const t=todayStr();
+  list.sort((a,b)=>{ const da=a.next_review_date||t, db=b.next_review_date||t; if(da!==db)return da<db?-1:1; return (a.review_count||0)-(b.review_count||0); });
+  State.review={list,idx:0,shown:false};
+}
+function renderReview(){
+  const {list,idx}=State.review; const empty=$('#review-empty'),wrap=$('#review-wrap');
+  if(idx>=list.length||!list.length){ empty.classList.remove('hidden'); wrap.classList.add('hidden'); $('#review-left').textContent='0'; renderDashboard(); return; }
+  empty.classList.add('hidden'); wrap.classList.remove('hidden');
+  const f=list[idx]; $('#rflip').classList.remove('flipped'); State.review.shown=false;
+  $('#review-kanji').textContent=f.kanji; $('#review-reading').textContent=f.reading||'—'; $('#review-meaning').textContent=f.meaning||'—';
+  $('#review-count').textContent=`${list.length-idx} tersisa`; $('#review-left').textContent=list.length-idx;
+  $('#review-show').classList.remove('hidden'); $('#review-grade').classList.add('hidden');
+}
+function reviewShowAnswer(){
+  State.review.shown=true; $('#rflip').classList.add('flipped');
+  $('#review-show').classList.add('hidden'); $('#review-grade').classList.remove('hidden');
+  if(State.autoplay){ const f=State.review.list[State.review.idx]; if(f)Speech.speak(f.kanji); }
+}
+async function reviewGrade(grade){
+  const f=State.review.list[State.review.idx]; if(!f)return;
+  let level=f.review_level||0, next;
+  if(grade==='sulit'){ level=Math.max(0,level-1); next=addDays(1); }
+  else if(grade==='normal'){ level=Math.min(6,level+1); next=addDays(SRS_DAYS[level]||1); }
+  else { level=Math.min(6,level+2); next=addDays(SRS_DAYS[level]||1); }
+  const patch={review_level:level,next_review_date:next,last_reviewed_at:new Date().toISOString(),review_count:(f.review_count||0)+1};
+  if(grade!=='sulit') patch.status='hafal';
+  await updateFlashcard(f.id,patch);
+  await bumpStreak();
+  State.review.idx++; renderReview();
+}
+async function bumpStreak(){
+  const p=State.profile; if(!p)return; const t=todayStr();
+  if(p.last_review_date===t)return;
+  if(p.last_review_date && daysBetween(p.last_review_date,t)===1) p.streak=(p.streak||0)+1;
+  else p.streak=1;
+  p.last_review_date=t; await saveStreak();
+}
+
+/* ============================ NOTES ============================ */
+function visibleNotes(){
+  const q=$('#note-search').value.trim().toLowerCase(), filter=$('#note-filter').value;
+  let arr=State.notes.slice();
+  if(filter)arr=arr.filter(n=>n.category_id===filter);
+  if(q)arr=arr.filter(n=>(n.title||'').toLowerCase().includes(q)||(n.content||'').toLowerCase().includes(q));
+  return arr;
+}
+function renderNotes(){
+  const list=$('#note-list'), arr=visibleNotes();
+  if(!arr.length){ list.innerHTML=`<div class="empty nb"><span class="em">📝</span>Belum ada catatan.</div>`; return; }
+  list.innerHTML=arr.map(n=>`<div class="row-card nb"><div class="grow"><div class="title">${esc(n.title)}</div>
+    <div class="sub">${esc((n.content||'').slice(0,80))}${(n.content||'').length>80?'…':''}</div>
+    <div style="margin-top:8px"><span class="tag gray">${esc(n.category_id?catName(n.category_id):'Tanpa Kategori')}</span></div></div>
+    <div class="card-actions"><button class="btn btn-mini btn-ghost" data-edit-note="${n.id}">✎</button><button class="btn btn-mini btn-danger" data-del-note="${n.id}">🗑</button></div></div>`).join('');
+  $$('[data-edit-note]',list).forEach(b=>b.onclick=()=>noteForm(b.dataset.editNote));
+  $$('[data-del-note]',list).forEach(b=>b.onclick=()=>confirmDeleteNote(b.dataset.delNote));
+}
+async function noteForm(id){
+  const editing=State.notes.find(n=>n.id===id);
+  const opts=`<option value="">Tanpa Kategori</option>`+State.categories.map(c=>`<option value="${c.id}" ${editing&&c.id===editing.category_id?'selected':''}>${esc(c.name)}</option>`).join('');
+  const ok=await modal({title:editing?'Edit Catatan':'Tambah Catatan',
+    body:`<div class="field"><label>Kategori</label><select class="select" id="m-note-cat" style="width:100%">${opts}</select></div>
+      <div class="field"><label>Judul</label><input class="input" id="m-note-title" value="${esc(editing?editing.title:'')}" placeholder="Mis. Pola ～たい"/></div>
+      <div class="field"><label>Isi</label><textarea class="textarea" id="m-note-content" placeholder="Tulis catatan…">${esc(editing?editing.content:'')}</textarea></div>`,
+    confirmText:editing?'Simpan':'Tambah',
+    onConfirm:async()=>{ const title=$('#m-note-title').value.trim(); if(!title){toast('Judul wajib diisi','warning');return false;}
+      const o={category_id:$('#m-note-cat').value||null,title,content:$('#m-note-content').value.trim()};
+      if(editing)await updateNote(id,o); else await createNote(o); }});
+  if(ok){ toast(editing?'Catatan diperbarui':'Catatan ditambahkan','success'); renderNotes(); }
+}
+async function confirmDeleteNote(id){
+  const n=State.notes.find(x=>x.id===id);
+  const ok=await modal({title:'Hapus Catatan?',body:`<p>"${esc(n.title)}" akan dihapus permanen.</p>`,confirmText:'Hapus',danger:true});
+  if(!ok)return; await deleteNote(id); toast('Catatan dihapus','success'); renderNotes();
+}
+
+/* ============================ DICTIONARY ============================ */
+/* Cek dictionary untuk satu kata (kanji atau reading sama persis) */
+async function lookupDictionary(word){
+  try{
+    const {data}=await sb.from('dictionary').select('kanji,reading,meaning,jlpt_level')
+      .or(`kanji.eq.${word},reading.eq.${word}`).limit(1).maybeSingle();
+    return data||null;
+  }catch(e){ return null; }
+}
+/* Cek banyak kata sekaligus (untuk batch) → map kanji→entry */
+async function lookupDictionaryMany(words){
+  const map={};
+  try{
+    const {data}=await sb.from('dictionary').select('kanji,reading,meaning').in('kanji',words);
+    (data||[]).forEach(d=>{ map[d.kanji]=d; });
+  }catch(e){}
+  return map;
+}
+/* Pencarian dictionary (kanji / hiragana / katakana / Indonesia) */
+async function searchDictionary(q, level){
+  let query=sb.from('dictionary').select('id,kanji,reading,meaning,jlpt_level');
+  if(level) query=query.eq('jlpt_level',level);
+  q=(q||'').trim();
+  if(q){
+    const hira=kataToHira(q);
+    const terms=[`kanji.ilike.%${q}%`,`reading.ilike.%${q}%`,`meaning.ilike.%${q}%`];
+    if(hira!==q) terms.push(`reading.ilike.%${hira}%`);
+    query=query.or(terms.join(','));
+  }
+  query=query.order('jlpt_level',{ascending:true}).limit(300);
+  const {data,error}=await query;
+  if(error){ toast('Gagal memuat kamus','error'); return []; }
+  return data||[];
+}
+let dictTimer=null;
+async function runDictionarySearch(){
+  const q=$('#dict-search').value, level=$('#dict-level').value;
+  const list=$('#dict-list'); list.innerHTML=`<div class="empty"><span class="em">⏳</span>Memuat…</div>`;
+  const res=await searchDictionary(q,level);
+  State.dictResults=res; State.dictLimit=50; renderDictionary();
+}
+function renderDictionary(){
+  const list=$('#dict-list'); const all=State.dictResults; const arr=all.slice(0,State.dictLimit);
+  $('#dict-count').textContent=`${all.length} kata`;
+  if(!all.length){ list.innerHTML=`<div class="empty nb"><span class="em">📕</span>Tidak ada hasil di kamus.<br/>Coba kata lain, atau tambahkan via Flashcard (AI).</div>`; $('#dict-more').classList.add('hidden'); return; }
+  list.innerHTML=arr.map(d=>{ const lv=(d.jlpt_level||'').toUpperCase(); const cls=lv==='N5'?'n5':lv==='N4'?'n4':'ai';
+    return `<div class="row-card nb jp"><div class="grow"><div class="title">${esc(d.kanji)}</div>
+      <div class="sub">${esc(d.reading||'')} · ${esc(d.meaning||'')}</div>
+      <div style="margin-top:8px;display:flex;gap:6px"><span class="tag ${cls}">${esc(lv||'—')}</span></div></div>
+      <div class="card-actions"><button class="btn btn-mini btn-ghost" data-dspk="${d.id}">🔊</button>
+      <button class="btn btn-mini btn-accent" data-dadd="${d.id}">➕</button></div></div>`; }).join('');
+  $('#dict-more').classList.toggle('hidden', all.length<=State.dictLimit);
+  $$('[data-dspk]',list).forEach(b=>b.onclick=()=>{ const d=all.find(x=>x.id===b.dataset.dspk); if(d)Speech.speak(d.kanji); });
+  $$('[data-dadd]',list).forEach(b=>b.onclick=()=>{ const d=all.find(x=>x.id===b.dataset.dadd); if(d)addDictToFlashcard(d); });
+}
+async function addDictToFlashcard(d){
+  if(!State.categories.length){ toast('Buat kategori terlebih dahulu','warning'); goto('category'); return; }
+  const opts=State.categories.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');
+  const ok=await modal({title:'Tambahkan ke Flashcard',
+    body:`<p>"${esc(d.kanji)}" (${esc(d.reading)}) — ${esc(d.meaning)}</p>
+      <div class="field"><label>Kategori</label><select class="select" id="m-da-cat" style="width:100%">${opts}</select></div>`,
+    confirmText:'Tambah',
+    onConfirm:async()=>{ const category_id=$('#m-da-cat').value; const card=await createFlashcard({category_id,kanji:d.kanji,reading:d.reading,meaning:d.meaning}); if(!card)return false; }});
+  if(ok){ toast('Ditambahkan ke flashcard 🎉','success'); refreshAll(); }
+}
+
+/* ============================ PROGRESS + CHARTS ============================ */
+function renderProgress(){
+  const {total,hafal,belum,pct}=stats();
+  $('#pg-total').textContent=total; $('#pg-hafal').textContent=hafal; $('#pg-belum').textContent=belum; $('#pg-pct').textContent=pct+'%';
+  drawDonut(hafal,belum); drawSrs();
+  const wrap=$('#pg-cats');
+  if(!State.categories.length){ wrap.innerHTML=`<div class="empty nb"><span class="em">📊</span>Belum ada data kategori.</div>`; return; }
+  wrap.innerHTML=State.categories.map(c=>{ const cards=State.flashcards.filter(f=>f.category_id===c.id); const h=cards.filter(f=>f.status==='hafal').length; const p=cards.length?Math.round(h/cards.length*100):0;
+    return `<div class="cat-stat nb"><div class="grow"><div class="nm">${esc(c.name)}</div><div class="mini-bar"><div class="mini-fill" style="width:${p}%"></div></div>
+      <div style="font-size:12px;font-weight:700;color:var(--text-2);margin-top:5px">${h}/${cards.length} hafal</div></div><div class="pct">${p}%</div></div>`; }).join('');
+}
+function drawDonut(hafal,belum){
+  const cv=$('#donut'); const dpr=window.devicePixelRatio||1; const W=cv.clientWidth||320,H=220;
+  cv.width=W*dpr;cv.height=H*dpr; const ctx=cv.getContext('2d'); ctx.scale(dpr,dpr); ctx.clearRect(0,0,W,H);
+  const cx=W/2,cy=H/2,R=78,r=46,total=hafal+belum;
+  const segs=total?[{v:hafal,color:'#4CC9B0'},{v:belum,color:'#FF7A59'}]:[{v:1,color:'#e7e4dc'}];
+  let start=-Math.PI/2;
+  segs.forEach(s=>{ const ang=(s.v/(total||1))*Math.PI*2; ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,R,start,start+ang);ctx.closePath();ctx.fillStyle=s.color;ctx.fill();ctx.lineWidth=4;ctx.strokeStyle='#000';ctx.stroke();start+=ang; });
+  ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fillStyle='#fff';ctx.fill();ctx.lineWidth=4;ctx.strokeStyle='#000';ctx.stroke();
+  const pct=total?Math.round(hafal/total*100):0;
+  ctx.fillStyle='#111';ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='900 30px Inter,sans-serif';ctx.fillText(pct+'%',cx,cy-6);
+  ctx.font='800 12px Inter,sans-serif';ctx.fillStyle='#444';ctx.fillText('HAFAL',cx,cy+16);
+  ctx.textAlign='left';ctx.font='800 13px Inter,sans-serif';
+  ctx.fillStyle='#4CC9B0';ctx.fillRect(0,H-18,14,14);ctx.strokeRect(0,H-18,14,14);ctx.fillStyle='#111';ctx.fillText('Hafal ('+hafal+')',20,H-11);
+  ctx.fillStyle='#FF7A59';ctx.fillRect(120,H-18,14,14);ctx.strokeRect(120,H-18,14,14);ctx.fillStyle='#111';ctx.fillText('Belum ('+belum+')',140,H-11);
+}
+function drawSrs(){
+  const cv=$('#srs-chart'); const dpr=window.devicePixelRatio||1; const W=cv.clientWidth||320,H=200;
+  cv.width=W*dpr;cv.height=H*dpr; const ctx=cv.getContext('2d'); ctx.scale(dpr,dpr); ctx.clearRect(0,0,W,H);
+  const counts=[0,0,0,0,0,0,0]; State.flashcards.forEach(f=>{ const l=Math.min(6,Math.max(0,f.review_level||0)); counts[l]++; });
+  const max=Math.max(1,...counts); const pad=28, bw=(W-pad*2)/7, base=H-30;
+  counts.forEach((c,i)=>{ const h=Math.round((c/max)*(base-20)); const x=pad+i*bw+4, y=base-h, w=bw-8;
+    ctx.fillStyle='#FFD84D'; ctx.fillRect(x,y,w,h); ctx.lineWidth=3;ctx.strokeStyle='#000';ctx.strokeRect(x,y,w,h);
+    ctx.fillStyle='#111';ctx.textAlign='center';ctx.font='800 12px Inter,sans-serif'; if(c>0)ctx.fillText(c,x+w/2,y-6);
+    ctx.font='800 11px Inter,sans-serif';ctx.fillStyle='#444';ctx.fillText('L'+i,x+w/2,H-10); });
+  ctx.beginPath();ctx.moveTo(pad-4,base);ctx.lineTo(W-pad+4,base);ctx.lineWidth=3;ctx.strokeStyle='#000';ctx.stroke();
+}
+
+/* ============================ SETTINGS / EXPORT-IMPORT ============================ */
+function renderSettings(){
+  const name=State.profile?.name||'Pelajar';
+  $('#set-name').textContent=name; $('#set-email').textContent=State.user?.email||''; $('#set-avatar').textContent=(name[0]||'P').toUpperCase();
+  $('#set-autoplay').checked=State.autoplay;
+}
+function exportData(){
+  const payload={app:'nihongo-flash',version:2,exported_at:new Date().toISOString(),profile:{name:State.profile?.name||''},
+    categories:State.categories.map(({id,name,created_at})=>({id,name,created_at})),
+    flashcards:State.flashcards.map(({id,category_id,kanji,reading,meaning,status,favorite,review_level,next_review_date,review_count,created_at})=>({id,category_id,kanji,reading,meaning,status,favorite,review_level,next_review_date,review_count,created_at})),
+    notes:State.notes.map(({id,category_id,title,content,created_at})=>({id,category_id,title,content,created_at}))};
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download=`nihongo-flash-backup-${todayStr()}.json`; a.click(); URL.revokeObjectURL(url);
+  toast('Data diekspor','success');
+}
+function importData(file){
+  const reader=new FileReader();
+  reader.onload=async()=>{
+    let data; try{data=JSON.parse(reader.result);}catch(e){return toast('File JSON tidak valid','error');}
+    if(data.app!=='nihongo-flash'||!Array.isArray(data.categories)||!Array.isArray(data.flashcards))return toast('Format backup tidak dikenali','error');
+    const notes=Array.isArray(data.notes)?data.notes:[];
+    const ok=await modal({title:'Import Data?',body:`<p>Menambahkan <b>${data.categories.length} kategori</b>, <b>${data.flashcards.length} flashcard</b>, <b>${notes.length} catatan</b>.</p>`,confirmText:'Import'});
+    if(!ok)return; overlay('Mengimpor data…');
+    try{
+      const map={};
+      for(const c of data.categories){ if(!c.name)continue; const created=await createCategory(c.name); if(created&&c.id)map[c.id]=created.id; }
+      const rows=data.flashcards.filter(f=>f.kanji).map(f=>({user_id:State.user.id,category_id:map[f.category_id]||(State.categories[0]&&State.categories[0].id)||null,kanji:f.kanji,reading:f.reading||'',meaning:f.meaning||'',status:f.status==='hafal'?'hafal':'belum_hafal',favorite:!!f.favorite,review_level:f.review_level||0,next_review_date:f.next_review_date||todayStr(),review_count:f.review_count||0})).filter(r=>r.category_id);
+      if(rows.length){ const {data:ins,error}=await sb.from('flashcards').insert(rows).select(); if(error)throw error; State.flashcards=(ins||[]).concat(State.flashcards); }
+      const nrows=notes.filter(n=>n.title).map(n=>({user_id:State.user.id,category_id:map[n.category_id]||null,title:n.title,content:n.content||''}));
+      if(nrows.length){ const {data:nins,error:ne}=await sb.from('notes').insert(nrows).select(); if(ne)throw ne; State.notes=(nins||[]).concat(State.notes); }
+      overlayOff(); toast('Import berhasil 🎉','success'); refreshAll();
+    }catch(err){ overlayOff(); toast('Import gagal: '+(err.message||''),'error',4000); }
+  };
+  reader.readAsText(file);
+}
+
+/* ============================ NAV / REFRESH ============================ */
+function refreshAll(){ renderDashboard(); renderCategory(); refreshFilters(); renderFlashcards(); renderNotes(); renderProgress(); renderSettings(); }
+function goto(screen){
+  show(screen); setActiveNav(['dashboard','flashcard','review','dictionary','notes','settings'].includes(screen)?screen:'');
+  if(screen==='dashboard')renderDashboard();
+  if(screen==='category')renderCategory();
+  if(screen==='flashcard'){State.fcLimit=60;refreshFilters();renderFlashcards();}
+  if(screen==='study')renderStudy();
+  if(screen==='review'){startReview();renderReview();}
+  if(screen==='dictionary'){ if(!State.dictResults.length) runDictionarySearch(); else renderDictionary(); }
+  if(screen==='notes'){refreshFilters();renderNotes();}
+  if(screen==='progress')renderProgress();
+  if(screen==='settings')renderSettings();
+}
+
+/* ============================ EVENTS ============================ */
+let searchTimer=null;
+function bindEvents(){
+  $$('[data-go]').forEach(b=>b.onclick=()=>show(b.dataset.go));
+  $('#reg-submit').onclick=doRegister; $('#log-submit').onclick=doLogin;
+  $('#welcome-google').onclick=doGoogle; $('#login-google').onclick=doGoogle;
+  $$('.nav-btn').forEach(b=>b.onclick=()=>goto(b.dataset.nav));
+  $$('[data-nav]').forEach(b=>{ if(!b.classList.contains('nav-btn'))b.onclick=()=>goto(b.dataset.nav); });
+
+  $('#cat-add-btn').onclick=()=>categoryForm(null);
+  $('#fc-add-btn').onclick=()=>addFlashcardForm(null);
+  $('#fc-batch-btn').onclick=batchImportForm; $('#dash-batch').onclick=batchImportForm;
+  $('#fc-study-btn').onclick=startStudy;
+  $('#fc-search').addEventListener('input',()=>{ clearTimeout(searchTimer); searchTimer=setTimeout(()=>{State.fcLimit=60;renderFlashcards();},120); });
+  $('#fc-filter').addEventListener('change',()=>{State.fcLimit=60;renderFlashcards();});
+  $('#fc-status').addEventListener('change',()=>{State.fcLimit=60;renderFlashcards();});
+  $('#fc-sort').addEventListener('change',()=>{State.fcLimit=60;renderFlashcards();});
+  $('#fc-more').onclick=()=>{State.fcLimit+=60;renderFlashcards();};
+
+  $('#flip').onclick=flipStudy;
+  $('#study-speak-f').onclick=e=>{e.stopPropagation();const f=State.study.list[State.study.idx];if(f)Speech.speak(f.kanji);};
+  $('#study-speak-b').onclick=e=>{e.stopPropagation();const f=State.study.list[State.study.idx];if(f)Speech.speak(f.kanji);};
+  $('#study-hafal').onclick=e=>{e.stopPropagation();studySetStatus('hafal');};
+  $('#study-belum').onclick=e=>{e.stopPropagation();studySetStatus('belum_hafal');};
+  $('#study-prev').onclick=()=>studyMove(-1); $('#study-next').onclick=()=>studyMove(1);
+
+  $('#review-show').onclick=reviewShowAnswer;
+  $('#review-speak-f').onclick=e=>{e.stopPropagation();const f=State.review.list[State.review.idx];if(f)Speech.speak(f.kanji);};
+  $('#review-speak-b').onclick=e=>{e.stopPropagation();const f=State.review.list[State.review.idx];if(f)Speech.speak(f.kanji);};
+  $$('#review-grade [data-grade]').forEach(b=>b.onclick=()=>reviewGrade(b.dataset.grade));
+
+  $('#note-add-btn').onclick=()=>noteForm(null);
+  $('#note-search').addEventListener('input',()=>{clearTimeout(searchTimer);searchTimer=setTimeout(renderNotes,120);});
+  $('#note-filter').addEventListener('change',renderNotes);
+
+  $('#dict-search').addEventListener('input',()=>{clearTimeout(dictTimer);dictTimer=setTimeout(runDictionarySearch,250);});
+  $('#dict-level').addEventListener('change',runDictionarySearch);
+  $('#dict-more').onclick=()=>{State.dictLimit+=50;renderDictionary();};
+
+  $('#set-autoplay').addEventListener('change',e=>{ State.autoplay=e.target.checked; localStorage.setItem('nf_autoplay',State.autoplay?'1':'0'); });
+  $('#btn-logout').onclick=doLogout; $('#btn-export').onclick=exportData;
+  $('#btn-import').onclick=()=>$('#import-file').click();
+  $('#import-file').onchange=e=>{ if(e.target.files[0])importData(e.target.files[0]); e.target.value=''; };
+
+  $('#log-pass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+  $('#reg-pass2').addEventListener('keydown',e=>{if(e.key==='Enter')doRegister();});
+}
+
+/* ============================ PWA ============================ */
+let deferredPrompt=null;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;showInstallPill();});
+function showInstallPill(){
+  if(!deferredPrompt)return;
+  $('#install-root').innerHTML=`<div class="install-pill nb"><div class="grow"><div class="t">📲 Pasang Nihongo Flash</div></div><button class="btn btn-sm btn-primary" id="pwa-install">Pasang</button><button class="btn btn-icon btn-ghost" id="pwa-dismiss">✕</button></div>`;
+  $('#pwa-install').onclick=async()=>{$('#install-root').innerHTML='';deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;};
+  $('#pwa-dismiss').onclick=()=>$('#install-root').innerHTML='';
+}
+if('serviceWorker' in navigator){ window.addEventListener('load',()=>navigator.serviceWorker.register('service-worker.js').catch(()=>{})); }
+
+/* ============================ INIT ============================ */
+async function init(){
+  bindEvents(); Speech.init();
+  const {data:{session}}=await sb.auth.getSession();
+  $('#boot').classList.add('hidden');
+  if(session?.user){ await afterLogin(session.user); } else { setNavVisible(false); show('welcome'); }
+  sb.auth.onAuthStateChange(async(event,sess)=>{
+    if(event==='SIGNED_IN'&&sess?.user&&!State.user){ await afterLogin(sess.user); }
+    if(event==='SIGNED_OUT'){ State.user=null; setNavVisible(false); show('welcome'); }
+  });
+}
+init();
+</script>
+</body>
+</html>
