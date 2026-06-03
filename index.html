@@ -456,7 +456,7 @@ input,select,textarea{font-family:inherit}
         <label class="switch"><input type="checkbox" id="set-autoplay"/><span class="track"><span class="knob"></span></span></label>
       </div>
       <div class="set-item nb">
-        <div class="grow"><div class="t">Voice Jepang</div><div class="d">Pilih suara untuk audio</div></div>
+        <div class="grow"><div class="t">Voice Jepang</div><div class="d">Fallback saat offline</div></div>
         <select class="select" id="set-voice" style="width:auto;max-width:55%"><option>Default</option></select>
       </div>
       <div class="section-title">Data</div>
@@ -553,12 +553,13 @@ function toRomaji(input){
   return out.toLowerCase();
 }
 
-/* ---------- AUDIO (Web Speech API) ---------- */
+/* ---------- AUDIO — Remote TTS (Google quality) + Web Speech fallback ---------- */
 const Speech = {
   ok: ('speechSynthesis' in window),
   voices: [], voice: null,
-  // Prioritas voice Jepang berkualitas (urutan dari terbaik)
+  audioCache: new Map(),   // cache audio per kata agar tidak re-fetch
   PRIORITY: [/kyoko/i, /google.*日本語/i, /google.*japanese/i, /haruka/i, /o-ren|otoya/i, /ja[-_]?jp/i, /^ja\b/i],
+  get ttsUrl(){ return CONFIG.API_URL.replace('/japanese','/tts'); },
   init(){
     if(!this.ok) return;
     const load=()=>{
@@ -578,10 +579,28 @@ const Speech = {
     if(v){ this.voice=v; localStorage.setItem('nf_voice', v.voiceURI||v.name); }
     else { localStorage.removeItem('nf_voice'); this.pickDefault(); }
   },
-  speak(text){
-    if(!this.ok){ toast('Voice Jepang tidak tersedia','warning'); return; }
+  // Putar audio via remote TTS (Google Translate kualitas), fallback ke Web Speech
+  async speak(text){
+    if(!text) return;
+    try{
+      // cek cache dulu
+      if(this.audioCache.has(text)){ new Audio(this.audioCache.get(text)).play().catch(()=>{}); return; }
+      const res = await fetch(this.ttsUrl, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({word:text}),
+        signal: AbortSignal.timeout(6000)
+      });
+      if(!res.ok) throw new Error('TTS remote gagal');
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      this.audioCache.set(text, url);
+      new Audio(url).play().catch(()=>{});
+      return;
+    } catch(e){}
+    // fallback ke Web Speech API
+    if(!this.ok){ return; }
     try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(text); u.lang='ja-JP'; if(this.voice)u.voice=this.voice; u.rate=.9; speechSynthesis.speak(u); }
-    catch(e){ toast('Voice Jepang tidak tersedia','warning'); }
+    catch(e){}
   }
 };
 function populateVoicePicker(){
