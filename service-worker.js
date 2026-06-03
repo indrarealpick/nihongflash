@@ -1,5 +1,5 @@
 /* service-worker.js — Nihongo Flash PWA */
-const CACHE = 'nihongo-flash-v7';
+const CACHE = 'nihongo-flash-v8';
 const APP_SHELL = [
   './',
   './index.html',
