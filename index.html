@@ -385,7 +385,7 @@ input,select,textarea{font-family:inherit}
 
   <!-- DICTIONARY -->
   <section id="screen-dictionary" class="screen">
-    <div class="topbar"><h1>Kamus</h1><div class="spacer"></div><span class="tag" id="dict-count">JLPT</span></div>
+    <div class="topbar"><h1>Kamus</h1><div class="spacer"></div><span class="tag" id="dict-count">JLPT N5 · N4</span></div>
     <div class="page">
       <div class="toolbar"><input class="input jp" id="dict-search" type="search" placeholder="🔍 Cari: 食べる / たべる / makan…" /></div>
       <div class="toolbar">
@@ -947,7 +947,7 @@ async function searchDictionary(q, level){
     if(hira!==q) terms.push(`reading.ilike.%${hira}%`);
     query=query.or(terms.join(','));
   }
-  query=query.order('jlpt_level',{ascending:true}).limit(300);
+  query=query.order('jlpt_level',{ascending:true}).limit(2000);
   const {data,error}=await query;
   if(error){ toast('Gagal memuat kamus','error'); return []; }
   return data||[];
@@ -961,7 +961,7 @@ async function runDictionarySearch(){
 }
 function renderDictionary(){
   const list=$('#dict-list'); const all=State.dictResults; const arr=all.slice(0,State.dictLimit);
-  $('#dict-count').textContent=`${all.length} kata`;
+  $('#dict-count').textContent = 'JLPT N5 · N4';
   if(!all.length){ list.innerHTML=`<div class="empty nb"><span class="em">📕</span>Tidak ada hasil di kamus.<br/>Coba kata lain, atau tambahkan via Flashcard (AI).</div>`; $('#dict-more').classList.add('hidden'); return; }
   list.innerHTML=arr.map(d=>{ const lv=(d.jlpt_level||'').toUpperCase(); const cls=lv==='N5'?'n5':lv==='N4'?'n4':'ai';
     return `<div class="row-card nb jp"><div class="grow"><div class="title">${esc(d.kanji)}</div>
