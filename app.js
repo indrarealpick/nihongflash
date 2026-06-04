@@ -250,21 +250,28 @@ function renderDashboard(){
   const name=State.profile?.name||'Pelajar';
   const h=new Date().getHours();
   $('#dash-greet').textContent = h<11?'おはよう！' : (h<18?'こんにちは！' : 'こんばんは！');
-  $('#dash-avatar').textContent=(name[0]||'P').toUpperCase();
-  // Ringkasan Hari Ini (data yang sudah ada)
+  // Avatar — show photo if available
+  const avatarUrl = State.profile?.avatar_url;
+  ['#dash-avatar','#set-avatar'].forEach(sel=>{
+    const el=$(sel); if(!el) return;
+    if(avatarUrl){ el.innerHTML=`<img src="${avatarUrl}" alt="avatar">`; }
+    else { el.innerHTML=(sel==='#set-avatar'?'<span class="avatar-cam">📷</span>':'')+(name[0]||'P').toUpperCase(); }
+  });
+  // Ringkasan Hari Ini
   const baru=State.flashcards.filter(f=>(f.review_count||0)===0).length;
   $('#sum-baru').textContent=baru;
   $('#sum-review').textContent=due;
   $('#sum-akurasi').textContent=pct+'%';
-  // Level/XP — kosmetik, dihitung dari jumlah hafal (tidak disimpan, tidak ubah logika)
+  // Level/XP (kosmetik dari data hafal)
   let deckHafal=0; for(const k in State.deckProgress){ if(State.deckProgress[k]==='hafal') deckHafal++; }
   const xp=(hafal+deckHafal)*10; const level=Math.floor(xp/500)+1; const within=xp%500;
-  $('#lvl-badge').textContent='L'+level;
-  $('#xp-fill').style.width=(within/500*100)+'%';
-  $('#xp-text').textContent=within+' / 500';
-  // Banner review (fungsional)
+  if($('#lvl-badge')) $('#lvl-badge').textContent='L'+level;
+  if($('#lvl-label-txt')) $('#lvl-label-txt').textContent='Level '+level;
+  if($('#xp-fill')) $('#xp-fill').style.width=(within/500*100)+'%';
+  if($('#xp-text')) $('#xp-text').textContent=within+' / 500 XP';
+  // Review banner
   const banner=$('#review-banner');
-  banner.innerHTML = due>0 ? `<div class="banner nb" style="margin-bottom:16px"><div class="grow"><div class="bt">📚 Ada ${due} kartu untuk direview.</div></div><button class="btn btn-sm btn-primary" id="banner-review">Review</button></div>` : '';
+  banner.innerHTML = due>0 ? `<div class="banner" style="margin-bottom:14px"><div class="grow"><div class="bt">📚 Ada ${due} kartu untuk direview.</div></div><button class="btn btn-sm btn-primary" id="banner-review">Review →</button></div>` : '';
   if(due>0) $('#banner-review').onclick=()=>goto('review');
   // Nav badge
   const navBadge=$('#nav-review-ic'); if(navBadge){ let b=navBadge.querySelector('.nav-badge'); if(due>0){ if(!b){b=document.createElement('span');b.className='nav-badge';navBadge.appendChild(b);} b.textContent=due>99?'99+':due; } else if(b){ b.remove(); } }
@@ -281,14 +288,33 @@ function drawWeekChart(){
     let c=0; State.flashcards.forEach(f=>{ if(f.last_reviewed_at){ const t=new Date(f.last_reviewed_at); if(t>=d&&t<nx)c++; } });
     counts.push(c); labels.push(init[d.getDay()]);
   }
-  const css=getComputedStyle(document.documentElement);
-  const bar=(css.getPropertyValue('--primary').trim())||'#6366F1';
-  const txt=(css.getPropertyValue('--text-2').trim())||'#6B7280';
+  const isDark=document.documentElement.getAttribute('data-theme')==='dark';
+  const barActive=isDark?'#818CF8':'#6366F1';
+  const barPassive=isDark?'#1E3A5F':'#E0E7FF';
+  const txt=isDark?'#64748B':'#9CA3AF';
   const max=Math.max(1,...counts); const pad=16, bw=(W-pad*2)/7, base=H-22;
   function rr(x,y,w,hh,r){ r=Math.min(r,w/2,hh/2); ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+hh,r); ctx.arcTo(x+w,y+hh,x,y+hh,r); ctx.arcTo(x,y+hh,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
-  counts.forEach((c,i)=>{ const bh=Math.round((c/max)*(base-14)); const x=pad+i*bw+bw*0.22, y=base-Math.max(bh,4), w=bw*0.56;
-    ctx.fillStyle=bar; ctx.globalAlpha=c>0?1:.22; rr(x,y,w,Math.max(bh,4),5); ctx.fill(); ctx.globalAlpha=1;
+  counts.forEach((c,i)=>{ const bh=Math.max(Math.round((c/max)*(base-14)),4); const x=pad+i*bw+bw*0.22, y=base-bh, w=bw*0.56;
+    ctx.fillStyle=c>0?barActive:barPassive; rr(x,y,w,bh,5); ctx.fill();
     ctx.fillStyle=txt;ctx.textAlign='center';ctx.font='600 11px Inter,sans-serif';ctx.fillText(labels[i],x+w/2,H-6); });
+}
+async function uploadAvatar(file){
+  if(!file||!State.user) return;
+  const ext=file.name.split('.').pop();
+  const path=`avatars/${State.user.id}.${ext}`;
+  overlay('Mengunggah foto…');
+  try{
+    const {error:upErr}=await sb.storage.from('avatars').upload(path,file,{upsert:true,contentType:file.type});
+    if(upErr) throw upErr;
+    const {data}=sb.storage.from('avatars').getPublicUrl(path);
+    const avatarUrl=data.publicUrl+'?t='+Date.now();
+    await sb.from('profiles').update({avatar_url:avatarUrl}).eq('id',State.user.id);
+    if(!State.profile) State.profile={};
+    State.profile.avatar_url=avatarUrl;
+    renderDashboard(); renderSettings();
+    toast('Foto profil diperbarui ✓','success');
+  }catch(e){ toast('Gagal upload: '+e.message,'error'); }
+  overlayOff();
 }
 
 /* ============================ CATEGORY ============================ */
@@ -867,6 +893,11 @@ function bindEvents(){
   $('#set-speed')?.addEventListener('change',e=>{ State.ttsSpeed=parseFloat(e.target.value); localStorage.setItem('nf_tts_speed',e.target.value); toast(`Kecepatan: ${e.target.value}×`,'success',1200); });
   $('#set-voice')?.addEventListener('change',e=>{ Speech.setVoice(e.target.value); if(e.target.value) toast('Voice diubah','success',1200); });
   $('#set-theme')?.addEventListener('change',e=>{ applyTheme(e.target.checked?'dark':'light'); });
+  // Avatar upload (Settings + Dashboard avatar tap)
+  ['#set-avatar','#dash-avatar'].forEach(sel=>{
+    $(sel)?.addEventListener('click',()=>$('#avatar-file')?.click());
+  });
+  $('#avatar-file')?.addEventListener('change',e=>{ const f=e.target.files?.[0]; if(f)uploadAvatar(f); e.target.value=''; });
   $('#btn-logout').onclick=doLogout; $('#btn-export').onclick=exportData;
   $('#btn-import').onclick=()=>$('#import-file').click();
   $('#import-file').onchange=e=>{ if(e.target.files[0])importData(e.target.files[0]); e.target.value=''; };
