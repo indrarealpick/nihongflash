@@ -356,20 +356,21 @@ function drawWeekChart(){
 }
 async function uploadAvatar(file){
   if(!file||!State.user) return;
-  const ext=file.name.split('.').pop();
-  const path=`avatars/${State.user.id}.${ext}`;
+  const ext=file.name.split('.').pop().toLowerCase();
+  const path=`${State.user.id}.${ext}`;
   overlay('Mengunggah foto…');
   try{
     const {error:upErr}=await sb.storage.from('avatars').upload(path,file,{upsert:true,contentType:file.type});
-    if(upErr) throw upErr;
+    if(upErr) throw new Error('Upload gagal: '+upErr.message);
     const {data}=sb.storage.from('avatars').getPublicUrl(path);
     const avatarUrl=data.publicUrl+'?t='+Date.now();
-    await sb.from('profiles').update({avatar_url:avatarUrl}).eq('id',State.user.id);
+    const {error:dbErr}=await sb.from('profiles').update({avatar_url:avatarUrl}).eq('id',State.user.id);
+    if(dbErr) throw new Error('Simpan profil gagal: '+dbErr.message);
     if(!State.profile) State.profile={};
     State.profile.avatar_url=avatarUrl;
     renderDashboard(); renderSettings();
     toast('Foto profil diperbarui ✓','success');
-  }catch(e){ toast('Gagal upload: '+e.message,'error'); }
+  }catch(e){ toast(e.message,'error',4000); }
   overlayOff();
 }
 
