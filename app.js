@@ -28,7 +28,7 @@ const State = {
   ttsSpeed: parseFloat(localStorage.getItem('nf_tts_speed')||'1.0'),
   theme: localStorage.getItem('nf_theme')||'light',
   onboardIdx: 0,
-  translate:{ from:'id', to:'ja', mode:'both' },
+  translate:{ from:'id', to:'ja' },
   autoplay: localStorage.getItem('nf_autoplay')==='1'
 };
 
@@ -252,6 +252,7 @@ function effectiveStreak(){ const p=State.profile; if(!p||!p.last_review_date)re
 /* ============================ TRANSLATE ============================ */
 const TR_API = CONFIG.API_URL.replace('/japanese','/translate');
 const TR_LANGS = { id:'🇮🇩 Indonesia', ja:'🇯🇵 日本語' };
+let _trTimer=null, _trLast='';
 
 function renderTranslateDir(){
   const {from,to}=State.translate;
@@ -259,65 +260,100 @@ function renderTranslateDir(){
   $('#tr-to-label').textContent=TR_LANGS[to];
 }
 function bindTranslate(){
-  // Char counter
+  // Auto-translate saat mengetik (debounce 900ms)
   $('#tr-input')?.addEventListener('input',e=>{
     $('#tr-charcount').textContent=e.target.value.length;
+    clearTimeout(_trTimer);
+    const val=e.target.value.trim();
+    if(val.length<1){ $('#tr-results')?.classList.add('hidden'); $('#tr-loading')?.classList.add('hidden'); return; }
+    _trTimer=setTimeout(()=>doTranslate(), 900);
   });
-  // Swap direction
+  // Swap arah
   $('#tr-swap-btn')?.addEventListener('click',()=>{
     [State.translate.from, State.translate.to]=[State.translate.to, State.translate.from];
     renderTranslateDir();
+    if($('#tr-input')?.value?.trim()){ _trLast=''; doTranslate(); }
   });
-  // Mode chips
-  $$('.tr-chip').forEach(c=>c.addEventListener('click',()=>{
-    $$('.tr-chip').forEach(x=>x.classList.remove('active'));
-    c.classList.add('active');
-    State.translate.mode=c.dataset.mode;
-  }));
-  // Copy buttons
+  // Salin
   $$('.tr-copy').forEach(btn=>btn.addEventListener('click',()=>{
     const target=$('#'+btn.dataset.target);
     if(!target?.textContent) return;
     navigator.clipboard?.writeText(target.textContent).then(()=>toast('Disalin! 📋','success',1200));
   }));
-  // Translate button
-  $('#tr-btn')?.addEventListener('click', doTranslate);
-  // Enter in context = focus textarea
-  $('#tr-context')?.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); $('#tr-input')?.focus(); }});
+  // Foto OCR
+  $('#tr-photo-btn')?.addEventListener('click',()=>$('#tr-photo-file')?.click());
+  $('#tr-photo-file')?.addEventListener('change',e=>{ const f=e.target.files?.[0]; if(f)translatePhoto(f); e.target.value=''; });
 }
 async function doTranslate(){
   const text=$('#tr-input')?.value?.trim();
-  if(!text){ toast('Ketik teks dulu','warning'); return; }
-  const {from,to,mode}=State.translate;
-  const context=$('#tr-context')?.value?.trim()||'';
-  // Show loading
-  $('#tr-results')?.classList.add('hidden');
+  if(!text) return;
+  if(text===_trLast) return;
+  _trLast=text;
+  const {from,to}=State.translate;
+  $('#tr-loading-txt').textContent='AI sedang menerjemahkan…';
   $('#tr-loading')?.classList.remove('hidden');
-  $('#tr-btn').disabled=true; $('#tr-btn').textContent='Menerjemahkan…';
   try{
     const res=await fetch(TR_API,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({text,from,to,mode,context}),
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({text,from,to}),
       signal:AbortSignal.timeout(30000)
     });
     const data=await res.json();
     if(!res.ok) throw new Error(data.error||'AI error');
-    // Populate results
-    const showFormal = mode!=='casual' && data.formal;
-    const showCasual = mode!=='formal' && data.casual;
-    $('#tr-formal-wrap').classList.toggle('hidden',!showFormal);
-    $('#tr-casual-wrap').classList.toggle('hidden',!showCasual);
-    if(showFormal) $('#tr-formal').textContent=data.formal;
-    if(showCasual) $('#tr-casual').textContent=data.casual;
-    $('#tr-notes').textContent=data.notes||'';
-    $('#tr-notes-wrap').classList.toggle('hidden',!data.notes);
-    $('#tr-results').classList.remove('hidden');
+    showTrResult(data);
   }catch(err){
-    toast('Terjemah gagal: '+err.message,'error',4000);
+    toast('Terjemah gagal: '+err.message,'error',3500);
   }finally{
     $('#tr-loading')?.classList.add('hidden');
-    $('#tr-btn').disabled=false; $('#tr-btn').innerHTML='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 8l6 6"/><path d="M4 14l6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="M22 22l-5-10-5 10"/><path d="M14 18h6"/></svg> Terjemahkan';
+  }
+}
+function showTrResult(data){
+  $('#tr-translation').textContent = data.translation || '';
+  const hasReading = (data.reading||'').trim() || (data.romaji||'').trim();
+  $('#tr-reading-wrap').classList.toggle('hidden', !hasReading);
+  $('#tr-reading').textContent = data.reading || '';
+  $('#tr-romaji').textContent = data.romaji || '';
+  $('#tr-results').classList.remove('hidden');
+}
+// Resize gambar di client agar upload ringan & cepat
+function resizeImage(file,maxDim=1280){
+  return new Promise((resolve,reject)=>{
+    const img=new Image();
+    img.onload=()=>{
+      let {width:w,height:h}=img;
+      if(w>maxDim||h>maxDim){ const s=Math.min(maxDim/w,maxDim/h); w=Math.round(w*s); h=Math.round(h*s); }
+      const cv=document.createElement('canvas'); cv.width=w; cv.height=h;
+      cv.getContext('2d').drawImage(img,0,0,w,h);
+      resolve(cv.toDataURL('image/jpeg',0.85));
+    };
+    img.onerror=reject;
+    img.src=URL.createObjectURL(file);
+  });
+}
+async function translatePhoto(file){
+  const {to}=State.translate;
+  $('#tr-loading-txt').textContent='Membaca teks dari foto…';
+  $('#tr-results')?.classList.add('hidden');
+  $('#tr-loading')?.classList.remove('hidden');
+  try{
+    const image=await resizeImage(file);
+    const res=await fetch(TR_API,{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({image,to}),
+      signal:AbortSignal.timeout(45000)
+    });
+    const data=await res.json();
+    if(!res.ok) throw new Error(data.error||'AI error');
+    if(data.detected){
+      $('#tr-input').value=data.detected;
+      $('#tr-charcount').textContent=data.detected.length;
+      _trLast=data.detected;
+    }
+    showTrResult(data);
+  }catch(err){
+    toast('Gagal baca foto: '+err.message,'error',4000);
+  }finally{
+    $('#tr-loading')?.classList.add('hidden');
   }
 }
 
