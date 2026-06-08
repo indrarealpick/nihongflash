@@ -1,6 +1,8 @@
-// api/translate.js — AI Translate (formal + informal + konteks)
+// api/translate.js — AI Translate gaya DeepL (natural) + cara baca
 // POST /api/translate
-// Body: { text, from, to, mode, context }
+// Body teks : { text, from, to }
+// Body foto : { image (data URL base64), to }
+// Return    : { translation, reading, romaji, detected? }
 
 function setCors(res){
   res.setHeader('Access-Control-Allow-Origin','*');
@@ -16,43 +18,62 @@ export default async function handler(req, res){
   let body=req.body;
   if(typeof body==='string'){try{body=JSON.parse(body);}catch{body={};}}
 
-  const text   = (body?.text||'').trim();
-  const from   = body?.from||'id';   // 'id' | 'ja'
-  const to     = body?.to||'ja';     // 'id' | 'ja'
-  const mode   = body?.mode||'both'; // 'formal'|'casual'|'both'
-  const context= (body?.context||'').trim();
+  const text  = (body?.text||'').trim();
+  const image = body?.image||'';
+  const from  = body?.from||'id';
+  const to    = body?.to||'ja';
 
-  if(!text||text.length>600) return res.status(400).json({error:'Teks tidak valid'});
   if(!process.env.OPENROUTER_API_KEY) return res.status(500).json({error:'OPENROUTER_API_KEY tidak ada'});
+  if(!text && !image) return res.status(400).json({error:'Teks atau foto wajib diisi'});
+  if(text && text.length>600) return res.status(400).json({error:'Teks terlalu panjang'});
 
   const fromLabel = from==='ja'?'Japanese':'Indonesian';
   const toLabel   = to==='ja'?'Japanese':'Indonesian';
-  const ctxNote   = context ? `\nContext/Situation: ${context}` : '';
 
-  const systemPrompt = `You are an expert Japanese-Indonesian translator with deep knowledge of:
-- Japanese keigo (敬語) and casual speech (タメ口)
-- Indonesian formal (baku) and casual/colloquial register
-- Cultural nuances and situational appropriateness
-- Natural, native-sounding expressions
+  const systemPrompt = `You are a world-class translator like DeepL, specialized in Japanese and Indonesian.
+Your translations are NATURAL and NATIVE-sounding — how a real Japanese/Indonesian person would actually say it in daily life.
+NEVER translate literally or in a stiff, textbook/bookish way. Capture the true meaning, tone, and nuance, choosing the most natural register for the situation.
+For Japanese output, use natural everyday Japanese (not overly formal unless context demands it).
+Always respond ONLY in valid JSON, no extra text.`;
 
-Always respond ONLY in valid JSON with no extra text outside the JSON.`;
+  // Field rules:
+  // - translation: the natural translation in the target language
+  // - reading: if the translation is JAPANESE, give full hiragana reading (furigana). Else "".
+  // - romaji: if the translation is JAPANESE, give romaji. Else "".
 
-  const userPrompt = `Translate the following text from ${fromLabel} to ${toLabel}.
-Text: "${text}"${ctxNote}
+  let messages;
+  if(image){
+    messages = [
+      { role:'system', content: systemPrompt },
+      { role:'user', content: [
+        { type:'text', text:
+`This image contains text (likely Japanese or Indonesian).
+1. Extract ALL text exactly as written → field "detected".
+2. Auto-detect source language. If Japanese → translate to natural Indonesian. If Indonesian → translate to natural Japanese.
+3. "reading": if the translation is Japanese, full hiragana reading; otherwise "".
+4. "romaji": if the translation is Japanese, romaji; otherwise "".
 
-Rules:
-- "formal": natural, polite, professional translation. For Japanese use keigo (です/ます/〜していただく etc). For Indonesian use bahasa baku.
-- "casual": natural, friendly, conversational. For Japanese use plain/colloquial form. For Indonesian use everyday casual speech.
-- "notes": 2-3 sentences explaining contextual nuances, when to use each version, or any important cultural/linguistic notes. Write in Indonesian.
-- If mode is "formal" only, still provide casual as empty string "".
-- If mode is "casual" only, still provide formal as empty string "".
+Respond ONLY with JSON:
+{"detected":"...","translation":"...","reading":"...","romaji":"..."}` },
+        { type:'image_url', image_url:{ url: image } }
+      ]}
+    ];
+  } else {
+    const userPrompt =
+`Translate from ${fromLabel} to ${toLabel}, naturally like a native speaker (DeepL-style, NOT literal/stiff).
+Text: "${text}"
 
-Respond ONLY with this JSON:
-{
-  "formal": "...",
-  "casual": "...",
-  "notes": "..."
-}`;
+- "translation": the natural translation in ${toLabel}.
+- "reading": if translation is Japanese, full hiragana reading (furigana) of the whole sentence; otherwise "".
+- "romaji": if translation is Japanese, romaji of the whole sentence; otherwise "".
+
+Respond ONLY with JSON:
+{"translation":"...","reading":"...","romaji":"..."}`;
+    messages = [
+      { role:'system', content: systemPrompt },
+      { role:'user', content: userPrompt }
+    ];
+  }
 
   try{
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions',{
@@ -65,14 +86,11 @@ Respond ONLY with this JSON:
       },
       body:JSON.stringify({
         model:'openai/gpt-4.1',
-        max_tokens:800,
-        temperature:0.3,
-        messages:[
-          {role:'system',content:systemPrompt},
-          {role:'user',content:userPrompt}
-        ]
+        max_tokens: image?700:500,
+        temperature:0.4,
+        messages
       }),
-      signal:AbortSignal.timeout(25000)
+      signal:AbortSignal.timeout(image?40000:25000)
     });
 
     if(!response.ok){
@@ -82,21 +100,9 @@ Respond ONLY with this JSON:
 
     const data=await response.json();
     const raw=data.choices?.[0]?.message?.content||'{}';
-
-    // Parse JSON from AI response
     let result;
-    try{
-      const clean=raw.replace(/```json|```/g,'').trim();
-      result=JSON.parse(clean);
-    }catch(e){
-      // Fallback: try to extract JSON
-      const match=raw.match(/\{[\s\S]*\}/);
-      result=match?JSON.parse(match[0]):{formal:'',casual:'',notes:'Gagal parse respons AI.'};
-    }
-
-    // Filter by mode
-    if(mode==='formal') result.casual='';
-    if(mode==='casual') result.formal='';
+    try{ result=JSON.parse(raw.replace(/```json|```/g,'').trim()); }
+    catch(e){ const m=raw.match(/\{[\s\S]*\}/); result=m?JSON.parse(m[0]):{translation:'',reading:'',romaji:''}; }
 
     return res.status(200).json(result);
 
