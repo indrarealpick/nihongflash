@@ -380,6 +380,14 @@ input,select,textarea{font-family:inherit}
 .lk-meaning{font-size:18px;font-weight:600;color:var(--text);margin-top:8px}
 .lk-actions{display:flex;gap:10px;margin-top:20px}
 .lk-actions .btn{flex:1}
+.lk-ex-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;margin-top:14px;box-shadow:var(--shadow-xs)}
+.lk-ex-title{font-size:13px;font-weight:700;color:var(--text-2);margin-bottom:14px}
+.lk-ex-item{padding:12px 0;border-top:1px dashed var(--border)}
+.lk-ex-item:first-of-type{padding-top:0;border-top:none}
+.lk-ex-jp{font-family:var(--font-jp);font-size:17px;font-weight:600;color:var(--text);line-height:1.6}
+.lk-ex-id{font-size:14px;font-weight:500;color:var(--text-2);margin-top:6px;line-height:1.5}
+.lk-ex-loading{display:flex;align-items:center;gap:10px;color:var(--text-3);font-weight:500;font-size:14px}
+.lk-ex-empty{color:var(--text-3);font-weight:500;font-size:14px}
 
 /* === ONBOARDING === */
 .ob-wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:24px 24px calc(32px + var(--safe-b));max-width:480px;margin:0 auto;position:relative}
@@ -792,6 +800,11 @@ input,select,textarea{font-family:inherit}
             <button class="btn btn-primary" id="lk-add">➕ Tambah Flashcard</button>
           </div>
         </div>
+
+        <div class="lk-ex-card" id="lk-ex-card">
+          <div class="lk-ex-title">📝 Contoh Kalimat</div>
+          <div id="lk-ex-list"></div>
+        </div>
       </div>
 
       <div id="lk-empty" class="empty hidden"><span class="em">🔍</span>Kata tidak ditemukan.<br/>Coba kata lain.</div>
@@ -814,14 +827,6 @@ input,select,textarea{font-family:inherit}
       <div class="set-item nb">
         <div class="grow"><div class="t">Voice Jepang</div><div class="d">Fallback saat offline</div></div>
         <select class="select" id="set-voice" style="width:auto;max-width:55%"><option>Default</option></select>
-      </div>
-      <div class="set-item nb">
-        <div class="grow"><div class="t">Kecepatan Audio</div><div class="d">Kecepatan putar suara</div></div>
-        <select class="select" id="set-speed" style="width:auto">
-          <option value="0.8">0.8× Lambat</option>
-          <option value="1.0" selected>1.0× Normal</option>
-          <option value="1.2">1.2× Cepat</option>
-        </select>
       </div>
       <div class="section-title">Tampilan</div>
       <div class="set-item nb">

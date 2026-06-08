@@ -298,6 +298,35 @@ function showLookup(d){
   $('#lk-reading').textContent=d.reading||'';
   $('#lk-meaning').textContent=d.meaning||'';
   $('#lk-result').classList.remove('hidden');
+  renderExamples(d);
+}
+const EX_API = CONFIG.API_URL.replace('/japanese','/example');
+async function renderExamples(d){
+  const list=$('#lk-ex-list'); if(!list) return;
+  // 1) Dari dictionary jika tersedia
+  if(d.example_jp){
+    list.innerHTML=exItem(d.example_jp,d.example_id);
+    return;
+  }
+  // 2) AI fallback
+  list.innerHTML=`<div class="lk-ex-loading"><div class="spinner" style="width:18px;height:18px;border-width:2px"></div>Membuat contoh…</div>`;
+  try{
+    const res=await fetch(EX_API,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({word:d.kanji,reading:d.reading,meaning:d.meaning}),
+      signal:AbortSignal.timeout(25000)
+    });
+    const data=await res.json();
+    if(!res.ok||!data.example_jp) throw new Error(data.error||'Tidak ada contoh');
+    // simpan di objek agar tidak fetch ulang
+    d.example_jp=data.example_jp; d.example_id=data.example_id;
+    list.innerHTML=exItem(data.example_jp,data.example_id);
+  }catch(e){
+    list.innerHTML=`<div class="lk-ex-empty">Contoh kalimat belum tersedia.</div>`;
+  }
+}
+function exItem(jp,id){
+  return `<div class="lk-ex-item"><div class="lk-ex-jp">${esc(jp||'')}</div><div class="lk-ex-id">${esc(id||'')}</div></div>`;
 }
 async function lookupAddFav(d){
   if(!State.categories.length){ toast('Buat kategori dulu','warning'); goto('category'); return; }
@@ -368,7 +397,7 @@ function renderDashboard(){
   const {total,hafal,belum,pct}=stats(); const due=dueCards().length;
   const name=State.profile?.name||'Pelajar';
   const h=new Date().getHours();
-  $('#dash-greet').textContent = h<11?'おはよう！' : (h<18?'こんにちは！' : 'こんばんは！');
+  $('#dash-greet').textContent = (h>=5&&h<11)?'おはよう！' : (h>=11&&h<18)?'こんにちは！' : 'こんばんは！';
   // Avatar — show photo if available
   const avatarUrl = State.profile?.avatar_url;
   ['#dash-avatar','#set-avatar'].forEach(sel=>{
@@ -830,10 +859,17 @@ async function confirmDeleteNote(id){
 /* Cek dictionary untuk satu kata (kanji atau reading sama persis) */
 async function lookupDictionary(word){
   try{
-    const {data}=await sb.from('dictionary').select('kanji,reading,meaning,jlpt_level')
+    const {data}=await sb.from('dictionary').select('kanji,reading,meaning,jlpt_level,example_jp,example_id')
       .or(`kanji.eq.${word},reading.eq.${word}`).limit(1).maybeSingle();
     return data||null;
-  }catch(e){ return null; }
+  }catch(e){
+    // fallback jika kolom contoh belum ada
+    try{
+      const {data}=await sb.from('dictionary').select('kanji,reading,meaning,jlpt_level')
+        .or(`kanji.eq.${word},reading.eq.${word}`).limit(1).maybeSingle();
+      return data||null;
+    }catch(e2){ return null; }
+  }
 }
 /* Cek banyak kata sekaligus (untuk batch) → map kanji→entry */
 async function lookupDictionaryMany(words){
@@ -1038,7 +1074,6 @@ function renderSettings(){
   const delBtn=$('#set-avatar-del');
   if(delBtn) delBtn.classList.toggle('hidden', !avatarUrl);
   $('#set-autoplay').checked=State.autoplay;
-  $('#set-speed').value = String(State.ttsSpeed);
   $('#set-theme').checked = (State.theme==='dark');
   populateVoicePicker();
 }
@@ -1146,7 +1181,6 @@ function bindEvents(){
   $('#deck-shuffle').onclick=deckShuffle;
 
   $('#set-autoplay')?.addEventListener('change',e=>{ State.autoplay=e.target.checked; localStorage.setItem('nf_autoplay',State.autoplay?'1':'0'); });
-  $('#set-speed')?.addEventListener('change',e=>{ State.ttsSpeed=parseFloat(e.target.value); localStorage.setItem('nf_tts_speed',e.target.value); toast(`Kecepatan: ${e.target.value}×`,'success',1200); });
   $('#set-voice')?.addEventListener('change',e=>{ Speech.setVoice(e.target.value); if(e.target.value) toast('Voice diubah','success',1200); });
   $('#set-theme')?.addEventListener('change',e=>{ applyTheme(e.target.checked?'dark':'light'); });
   // Avatar upload (Settings + Dashboard avatar tap)
