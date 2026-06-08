@@ -9,6 +9,9 @@
     },
     "api/translate.js": {
       "maxDuration": 30
+    },
+    "api/example.js": {
+      "maxDuration": 25
     }
   },
   "headers": [
