@@ -1235,7 +1235,7 @@ function importData(file){
 /* ============================ NAV / REFRESH ============================ */
 function refreshAll(){ renderDashboard(); renderCategory(); refreshFilters(); renderFlashcards(); renderNotes(); renderProgress(); renderSettings(); }
 function goto(screen){
-  show(screen); setActiveNav(screen==='deck'?'dictionary':(['dashboard','flashcard','review','dictionary','notes','settings'].includes(screen)?screen:''));
+  show(screen); setActiveNav(screen==='deck'?'dictionary':(['dashboard','flashcard','translate','review','dictionary','notes','settings','progress'].includes(screen)?screen:''));
   if(screen==='dashboard')renderDashboard();
   if(screen==='category')renderCategory();
   if(screen==='flashcard'){State.fcLimit=60;refreshFilters();renderFlashcards();}
@@ -1244,6 +1244,7 @@ function goto(screen){
   if(screen==='dictionary'){ renderDeckCards(); if(!State.dictResults.length) runDictionarySearch(); else renderDictionary(); }
   if(screen==='deck')renderDeck();
   if(screen==='notes'){refreshFilters();renderNotes();}
+  if(screen==='translate')renderRecentLookup();
   if(screen==='progress')renderProgress();
   if(screen==='settings')renderSettings();
 }

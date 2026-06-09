@@ -1,4 +1,4 @@
-const CACHE = 'nihongodeck-v3';
+const CACHE = 'nihongodeck-v4';
 const APP_SHELL = ['./','./index.html','./app.js','./manifest.json','./icon.svg','./icon-192.png','./icon-512.png'];
 const CDN_URLS = ['https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js'];
 
