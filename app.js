@@ -30,6 +30,9 @@ const State = {
   onboardIdx: 0,
   deckTotals: null,
   deckDates: {},
+  studyExamples: {},
+  sessionStats: {total:0,sulit:0,normal:0,mudah:0},
+  undoStack: null,
   autoplay: localStorage.getItem('nf_autoplay')==='1'
 };
 
@@ -694,6 +697,52 @@ async function runBatch(category_id, raw, skipExisting, root){
   $('#b-done').onclick=()=>{ root.innerHTML=''; toast(`Selesai: ${ok} berhasil`,'success'); refreshAll(); };
 }
 
+/* ============================ SWIPE + EXAMPLES + SESSION ============================ */
+
+// Batch preload contoh kalimat dari dictionary (no AI during review = keep it fast)
+async function preloadExamples(cards){
+  if(!cards||!cards.length) return;
+  const kanjis=[...new Set(cards.map(c=>c.kanji).filter(Boolean))];
+  if(!kanjis.length) return;
+  try{
+    const {data}=await sb.from('dictionary').select('kanji,example_jp,example_id').in('kanji',kanjis);
+    (data||[]).forEach(d=>{ if(d.example_jp) State.studyExamples[d.kanji]={jp:d.example_jp,id:d.example_id||''}; });
+  }catch(e){}
+}
+function renderExample(kanji, elId){
+  const el=$(elId); if(!el) return;
+  const ex=State.studyExamples[kanji];
+  if(ex&&ex.jp){ el.innerHTML=`<div class="fc-ex-jp">${esc(ex.jp)}</div><div class="fc-ex-id">${esc(ex.id)}</div>`; el.classList.remove('hidden'); }
+  else { el.classList.add('hidden'); }
+}
+// Generic swipe: tap, swipeLeft, swipeRight, swipeUp
+function bindSwipe(el, handlers){
+  let sx=0,sy=0,dragging=false; const T=55;
+  el.addEventListener('touchstart',e=>{ sx=e.touches[0].clientX; sy=e.touches[0].clientY; dragging=false; },{passive:true});
+  el.addEventListener('touchmove',e=>{
+    const dx=e.touches[0].clientX-sx, dy=e.touches[0].clientY-sy;
+    if(Math.abs(dx)>16||Math.abs(dy)>16) dragging=true;
+    if(Math.abs(dx)>30&&Math.abs(dx)>Math.abs(dy)){ el.classList.toggle('swipe-left',dx<0); el.classList.toggle('swipe-right',dx>0); el.classList.remove('swipe-up'); }
+    else if(dy<-30&&Math.abs(dy)>Math.abs(dx)){ el.classList.add('swipe-up'); el.classList.remove('swipe-left','swipe-right'); }
+    else{ el.classList.remove('swipe-left','swipe-right','swipe-up'); }
+  },{passive:true});
+  el.addEventListener('touchend',e=>{
+    const dx=e.changedTouches[0].clientX-sx, dy=e.changedTouches[0].clientY-sy;
+    el.classList.remove('swipe-left','swipe-right','swipe-up');
+    if(!dragging){ handlers.onTap&&handlers.onTap(); return; }
+    if(Math.abs(dx)>=T&&Math.abs(dx)>Math.abs(dy)*1.2){ dx<0?handlers.onLeft&&handlers.onLeft():handlers.onRight&&handlers.onRight(); }
+    else if(dy<=-T&&Math.abs(dy)>Math.abs(dx)*1.2){ handlers.onUp&&handlers.onUp(); }
+  },{passive:true});
+}
+// Undo pill
+let _undoTimer=null;
+function showUndoPill(){
+  const p=$('#undo-pill'); if(!p) return;
+  clearTimeout(_undoTimer); p.classList.remove('hidden','hiding');
+  _undoTimer=setTimeout(()=>{ p.classList.add('hiding'); setTimeout(()=>p.classList.add('hidden'),260); },4500);
+}
+function hideUndoPill(){ const p=$('#undo-pill'); if(!p) return; clearTimeout(_undoTimer); p.classList.add('hidden'); p.classList.remove('hiding'); }
+
 /* ============================ STUDY (FLIP) ============================ */
 function startStudy(){
   const filter=$('#fc-filter').value, status=$('#fc-status').value;
@@ -703,7 +752,9 @@ function startStudy(){
   else if(status==='hafal')list=list.filter(f=>f.status==='hafal');
   else if(status==='belum_hafal')list=list.filter(f=>f.status!=='hafal');
   list.sort((a,b)=>(a.status==='hafal'?1:0)-(b.status==='hafal'?1:0));
+  State.studyExamples={};
   State.study={list,idx:0,flipped:false};
+  preloadExamples(list);
   $('#study-cat').textContent=filter?catName(filter):'Semua';
   goto('study');
 }
@@ -717,7 +768,14 @@ function renderStudy(){
   if($('#study-pfill')) $('#study-pfill').style.width=((idx+1)/list.length*100)+'%';
   $('#study-hafal').style.opacity=f.status==='hafal'?'1':'.65'; $('#study-belum').style.opacity=f.status==='hafal'?'.65':'1';
 }
-function flipStudy(){ State.study.flipped=!State.study.flipped; $('#flip').classList.toggle('flipped',State.study.flipped); if(State.study.flipped&&State.autoplay){const f=State.study.list[State.study.idx]; if(f)Speech.speak(f.kanji);} }
+function flipStudy(){
+  State.study.flipped=!State.study.flipped;
+  $('#flip').classList.toggle('flipped',State.study.flipped);
+  if(State.study.flipped){
+    const f=State.study.list[State.study.idx];
+    if(f){ renderExample(f.kanji,'#study-example'); if(State.autoplay)Speech.speak(f.kanji); }
+  }
+}
 function studyMove(d){ const n=State.study.list.length; if(!n)return; State.study.idx=(State.study.idx+d+n)%n; renderStudy(); }
 async function studySetStatus(status){
   const f=State.study.list[State.study.idx]; if(!f)return;
@@ -732,32 +790,90 @@ function startReview(){
   const t=todayStr();
   list.sort((a,b)=>{ const da=a.next_review_date||t, db=b.next_review_date||t; if(da!==db)return da<db?-1:1; return (a.review_count||0)-(b.review_count||0); });
   State.review={list,idx:0,shown:false};
+  State.sessionStats={total:0,sulit:0,normal:0,mudah:0};
+  State.studyExamples={};
+  State.undoStack=null;
+  preloadExamples(list);
 }
 function renderReview(){
   const {list,idx}=State.review; const empty=$('#review-empty'),wrap=$('#review-wrap');
-  if(idx>=list.length||!list.length){ empty.classList.remove('hidden'); wrap.classList.add('hidden'); $('#review-left').textContent='0'; renderDashboard(); return; }
+  const summary=$('#review-summary');
+  if(idx>=list.length||!list.length){
+    wrap.classList.add('hidden'); empty.classList.add('hidden');
+    if(State.sessionStats.total>0 && summary){ summary.classList.remove('hidden'); showSessionSummary(); return; }
+    empty.classList.remove('hidden'); return;
+  }
+  if(summary) summary.classList.add('hidden');
   empty.classList.add('hidden'); wrap.classList.remove('hidden');
   const f=list[idx]; $('#rflip').classList.remove('flipped'); State.review.shown=false;
   $('#review-kanji').textContent=f.kanji; $('#review-reading').textContent=f.reading||'—'; $('#review-meaning').textContent=f.meaning||'—';
   $('#review-count').textContent=`${list.length-idx} tersisa`; $('#review-left').textContent=list.length-idx;
   $('#review-show').classList.remove('hidden'); $('#review-grade').classList.add('hidden');
+  // Hide example until answer shown
+  const exEl=$('#review-example'); if(exEl) exEl.classList.add('hidden');
 }
 function reviewShowAnswer(){
   State.review.shown=true; $('#rflip').classList.add('flipped');
   $('#review-show').classList.add('hidden'); $('#review-grade').classList.remove('hidden');
-  if(State.autoplay){ const f=State.review.list[State.review.idx]; if(f)Speech.speak(f.kanji); }
+  const f=State.review.list[State.review.idx];
+  if(f){ renderExample(f.kanji,'#review-example'); if(State.autoplay)Speech.speak(f.kanji); }
 }
 async function reviewGrade(grade){
   const f=State.review.list[State.review.idx]; if(!f)return;
+  // Save undo stack before modifying
+  State.undoStack={card:{...f}, idx:State.review.idx, grade};
+  // Track session stats
+  State.sessionStats.total++;
+  if(grade==='sulit') State.sessionStats.sulit++;
+  else if(grade==='normal') State.sessionStats.normal++;
+  else State.sessionStats.mudah++;
+
   let level=f.review_level||0, next;
   if(grade==='sulit'){ level=Math.max(0,level-1); next=addDays(1); }
   else if(grade==='normal'){ level=Math.min(6,level+1); next=addDays(SRS_DAYS[level]||1); }
   else { level=Math.min(6,level+2); next=addDays(SRS_DAYS[level]||1); }
   const patch={review_level:level,next_review_date:next,last_reviewed_at:new Date().toISOString(),review_count:(f.review_count||0)+1};
   if(grade!=='sulit') patch.status='hafal';
+  // Save patch to undo
+  State.undoStack.patch=patch;
+  State.undoStack.prevPatch={review_level:f.review_level||0,next_review_date:f.next_review_date||null,last_reviewed_at:f.last_reviewed_at||null,review_count:f.review_count||0,status:f.status||'belum_hafal'};
   await updateFlashcard(f.id,patch);
   await bumpStreak();
   State.review.idx++; renderReview();
+  showUndoPill();
+}
+async function undoReview(){
+  const u=State.undoStack; if(!u) return;
+  State.undoStack=null; hideUndoPill();
+  // Reverse session stats
+  State.sessionStats.total=Math.max(0,State.sessionStats.total-1);
+  if(u.grade==='sulit') State.sessionStats.sulit=Math.max(0,State.sessionStats.sulit-1);
+  else if(u.grade==='normal') State.sessionStats.normal=Math.max(0,State.sessionStats.normal-1);
+  else State.sessionStats.mudah=Math.max(0,State.sessionStats.mudah-1);
+  // Restore card
+  await updateFlashcard(u.card.id, u.prevPatch);
+  const fc=State.flashcards.find(x=>x.id===u.card.id); if(fc)Object.assign(fc,u.prevPatch);
+  State.review.idx=u.idx;
+  renderReview();
+  toast('Kartu dikembalikan ↩','success',1500);
+}
+function showSessionSummary(){
+  const {total,sulit,normal,mudah}=State.sessionStats;
+  const benar=normal+mudah;
+  const pct=total?Math.round(benar/total*100):0;
+  $('#ss-total').textContent=total; $('#ss-benar').textContent=benar;
+  $('#ss-sulit').textContent=sulit; $('#ss-pct').textContent=pct+'%';
+  $('#ss-emoji').textContent=pct>=80?'🎉':pct>=50?'💪':'📖';
+  $('#ss-sub').textContent=pct>=80?'Luar biasa! Pertahankan terus.':pct>=50?'Bagus, terus berlatih!':'Jangan menyerah, terus belajar!';
+  // Retry: review sulit cards again
+  $('#ss-retry').onclick=()=>{
+    const sulitCards=State.review.list.filter((_,i)=>{ return State.review.list.some((f,j)=>j<i&&f.id===_.id); }).length===0 &&
+      State.sessionStats.sulit>0 ? State.flashcards.filter(f=>f.next_review_date&&f.next_review_date<=todayStr()) : [];
+    // Simpler: just re-start review with any due cards
+    $('#review-summary').classList.add('hidden');
+    startReview(); renderReview();
+  };
+  $('#ss-done').onclick=()=>{ renderDashboard(); goto('dashboard'); };
 }
 async function bumpStreak(){
   const p=State.profile; if(!p)return; const t=todayStr();
@@ -1156,11 +1272,26 @@ function bindEvents(){
   $('#study-hafal').onclick=e=>{e.stopPropagation();studySetStatus('hafal');};
   $('#study-belum').onclick=e=>{e.stopPropagation();studySetStatus('belum_hafal');};
   $('#study-prev').onclick=()=>studyMove(-1); $('#study-next').onclick=()=>studyMove(1);
+  // Swipe gesture: study deck (← belum hafal, → hafal)
+  bindSwipe($('#flip'),{
+    onTap: flipStudy,
+    onLeft: ()=>{ if(State.study.flipped) studySetStatus('belum_hafal'); },
+    onRight: ()=>{ if(State.study.flipped) studySetStatus('hafal'); }
+  });
 
   $('#review-show').onclick=reviewShowAnswer;
   $('#review-speak-f').onclick=e=>{e.stopPropagation();const f=State.review.list[State.review.idx];if(f)Speech.speak(f.kanji);};
   $('#review-speak-b').onclick=e=>{e.stopPropagation();const f=State.review.list[State.review.idx];if(f)Speech.speak(f.kanji);};
   $$('#review-grade [data-grade]').forEach(b=>b.onclick=()=>reviewGrade(b.dataset.grade));
+  // Swipe gesture: SRS review (← sulit, → mudah, ↑ normal / show answer)
+  bindSwipe($('#rflip'),{
+    onTap: ()=>{ if(!State.review.shown) reviewShowAnswer(); },
+    onLeft: ()=>{ if(State.review.shown) reviewGrade('sulit'); },
+    onRight: ()=>{ if(State.review.shown) reviewGrade('mudah'); },
+    onUp: ()=>{ if(!State.review.shown) reviewShowAnswer(); else reviewGrade('normal'); }
+  });
+  // Undo pill
+  $('#undo-pill')?.addEventListener('click', undoReview);
 
   $('#note-add-btn').onclick=()=>noteForm(null);
   $('#note-photo-btn')?.addEventListener('click',()=>$('#note-photo-file')?.click());

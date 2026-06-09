@@ -410,14 +410,46 @@ input,select,textarea{font-family:inherit}
 .ob-next{flex:1}
 [data-theme="dark"] .ob-badge{background:rgba(99,102,241,.2);color:#A5B4FC}
 [data-theme="dark"] .ob-dot{background:#334155}
+/* === SWIPE HINTS === */
+.flip-swipe-hints{display:flex;justify-content:space-between;align-items:center;width:100%;position:absolute;bottom:14px;left:0;padding:0 14px;font-size:11px;font-weight:700;opacity:.38;pointer-events:none}
+.study-hints .sh-l,.study-hints .sh-r{display:flex;align-items:center;gap:2px}
+.sh-l{color:var(--danger)}.sh-u{flex:1;text-align:center;color:var(--amber)}.sh-r{color:var(--accent)}
+.flip.swipe-left{transform:translateX(-18px) rotate(-4deg);transition:transform .15s!important}
+.flip.swipe-right{transform:translateX(18px) rotate(4deg);transition:transform .15s!important}
+.flip.swipe-up{transform:translateY(-14px);transition:transform .15s!important}
+
+/* === EXAMPLE IN FLASHCARD === */
+.fc-example{width:100%;margin-top:12px;padding-top:12px;border-top:1px dashed var(--border);text-align:left}
+.fc-ex-jp{font-family:var(--font-jp);font-size:14px;font-weight:600;color:var(--text);line-height:1.6}
+.fc-ex-id{font-size:12px;font-weight:500;color:var(--text-2);margin-top:4px;line-height:1.5}
+
+/* === SESSION SUMMARY === */
+.session-summary{padding-top:16px}
+.session-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px 24px;text-align:center;box-shadow:var(--shadow-md)}
+.session-emoji{font-size:56px;line-height:1;margin-bottom:12px}
+.session-title{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-.01em}
+.session-sub{font-size:14px;font-weight:500;color:var(--text-2);margin-top:8px;margin-bottom:24px}
+.session-stats{display:flex;justify-content:space-around;padding:16px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:24px}
+.ss-item{text-align:center}
+.ss-n{font-size:26px;font-weight:800;line-height:1}
+.ss-l{font-size:12px;font-weight:600;color:var(--text-2);margin-top:6px}
+.ss-green{color:var(--accent)}.ss-red{color:var(--danger)}.ss-primary{color:var(--primary)}
+.session-actions{display:flex;gap:12px}
+.session-actions .btn{flex:1}
+
+/* === UNDO PILL === */
+.undo-pill{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--nav-h) + var(--safe-b) + 16px);z-index:60;background:var(--text);color:var(--bg);border:none;border-radius:999px;padding:12px 24px;font-weight:700;font-size:15px;cursor:pointer;box-shadow:var(--shadow-md);animation:slideUp .25s ease;white-space:nowrap}
+.undo-pill.hiding{animation:fadeOut .25s ease forwards}
+@keyframes slideUp{from{opacity:0;transform:translateX(-50%) translateY(12px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+@keyframes fadeOut{to{opacity:0;transform:translateX(-50%) translateY(8px)}}
 </style>
 </head>
 <body>
 
 <div id="boot">
   <svg class="logo" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <rect x="6" y="6" width="108" height="108" rx="22" fill="#EEF2FF" stroke="#6366F1" stroke-width="5"/>
-    <text x="60" y="78" text-anchor="middle" font-family="'Noto Sans JP',sans-serif" font-size="58" font-weight="900" fill="#6366F1">日</text>
+    <rect x="6" y="6" width="108" height="108" rx="22" fill="#FCEFF2" stroke="#DE7A8C" stroke-width="5"/>
+    <text x="60" y="78" text-anchor="middle" font-family="'Noto Sans JP',sans-serif" font-size="58" font-weight="900" fill="#DE7A8C">日</text>
   </svg>
 </div>
 
@@ -428,8 +460,8 @@ input,select,textarea{font-family:inherit}
     <div class="page page-noNav">
       <div class="brand">
         <svg class="logo" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
-          <rect x="6" y="6" width="108" height="108" rx="24" fill="#EEF2FF" stroke="#6366F1" stroke-width="5"/>
-          <text x="60" y="80" text-anchor="middle" font-family="'Noto Sans JP',sans-serif" font-size="60" font-weight="900" fill="#6366F1">日</text>
+          <rect x="6" y="6" width="108" height="108" rx="24" fill="#FCEFF2" stroke="#DE7A8C" stroke-width="5"/>
+          <text x="60" y="80" text-anchor="middle" font-family="'Noto Sans JP',sans-serif" font-size="60" font-weight="900" fill="#DE7A8C">日</text>
         </svg>
         <h1>Nihongo&nbsp;Flash</h1>
         <div class="tag-line">Belajar Bahasa Jepang Lebih Cepat.</div>
@@ -652,7 +684,10 @@ input,select,textarea{font-family:inherit}
           <div class="flip-face flip-back">
             <button class="speak-btn" id="study-speak-b">🔊</button>
             <div class="rd-lbl">Cara Baca</div><div class="reading" id="study-reading">—</div>
-            <div class="mn-lbl">Arti</div><div class="meaning" id="study-meaning">—</div><div class="flip-hint">Ketuk untuk membalik</div>
+            <div class="mn-lbl">Arti</div><div class="meaning" id="study-meaning">—</div>
+            <div class="fc-example hidden" id="study-example"></div>
+            <div class="flip-swipe-hints study-hints"><span class="sh-l">← Belum</span><span class="sh-r">Hafal →</span></div>
+            <div class="flip-hint">Ketuk untuk membalik</div>
           </div>
         </div></div>
         <div class="study-actions"><button class="btn btn-danger" id="study-belum">✗ Belum Hafal</button><button class="btn btn-accent" id="study-hafal">✓ Hafal</button></div>
@@ -671,12 +706,14 @@ input,select,textarea{font-family:inherit}
         <div class="flip" id="rflip"><div class="flip-inner">
           <div class="flip-face flip-front">
             <button class="speak-btn" id="review-speak-f">🔊</button>
-            <div class="kanji" id="review-kanji">—</div><div class="flip-hint">Tampilkan jawaban di bawah</div>
+            <div class="kanji" id="review-kanji">—</div><div class="flip-hint">Tap atau geser atas untuk jawaban</div>
           </div>
           <div class="flip-face flip-back">
             <button class="speak-btn" id="review-speak-b">🔊</button>
             <div class="rd-lbl">Cara Baca</div><div class="reading" id="review-reading">—</div>
             <div class="mn-lbl">Arti</div><div class="meaning" id="review-meaning">—</div>
+            <div class="fc-example hidden" id="review-example"></div>
+            <div class="flip-swipe-hints"><span class="sh-l">← Sulit</span><span class="sh-u">↑ Normal</span><span class="sh-r">Mudah →</span></div>
           </div>
         </div></div>
         <button class="btn btn-primary" id="review-show">Tampilkan Jawaban</button>
@@ -684,6 +721,23 @@ input,select,textarea{font-family:inherit}
           <button class="btn btn-danger" data-grade="sulit"><span class="em">😵</span>Sulit</button>
           <button class="btn btn-warning" data-grade="normal"><span class="em">🙂</span>Normal</button>
           <button class="btn btn-accent" data-grade="mudah"><span class="em">😎</span>Mudah</button>
+        </div>
+      </div>
+      <div class="session-summary hidden" id="review-summary">
+        <div class="session-card">
+          <div class="session-emoji" id="ss-emoji">🎉</div>
+          <div class="session-title">Sesi Selesai!</div>
+          <div class="session-sub" id="ss-sub">Bagus sekali hari ini.</div>
+          <div class="session-stats">
+            <div class="ss-item"><div class="ss-n" id="ss-total">0</div><div class="ss-l">Direview</div></div>
+            <div class="ss-item"><div class="ss-n ss-green" id="ss-benar">0</div><div class="ss-l">Benar</div></div>
+            <div class="ss-item"><div class="ss-n ss-red" id="ss-sulit">0</div><div class="ss-l">Sulit</div></div>
+            <div class="ss-item"><div class="ss-n ss-primary" id="ss-pct">0%</div><div class="ss-l">Akurasi</div></div>
+          </div>
+          <div class="session-actions">
+            <button class="btn btn-ghost" id="ss-retry">🔄 Review Lagi</button>
+            <button class="btn btn-primary" id="ss-done">🏠 Selesai</button>
+          </div>
         </div>
       </div>
       <div class="empty hidden" id="review-empty"><span class="em">🎉</span>Tidak ada kartu untuk direview hari ini.<br/>Kerja bagus!</div>
@@ -866,9 +920,10 @@ input,select,textarea{font-family:inherit}
 // Guard: CDN gagal load → tampilkan error, jangan stuck loading
 if (!window.supabase) {
   var b=document.getElementById('boot');
-  if(b){b.style.display='flex';b.innerHTML='<div style="padding:32px;text-align:center;max-width:320px;margin:0 auto"><div style="font-size:52px;margin-bottom:16px">📡</div><div style="font-weight:800;font-size:20px">Gagal Memuat</div><div style="color:#6B7280;margin-top:10px;font-size:15px;line-height:1.5">Cek internet lalu refresh.</div><button onclick="location.reload(true)" style="margin-top:20px;padding:14px 28px;background:#6366F1;color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;width:100%">🔄 Refresh</button></div>';}
+  if(b){b.style.display='flex';b.innerHTML='<div style="padding:32px;text-align:center;max-width:320px;margin:0 auto"><div style="font-size:52px;margin-bottom:16px">📡</div><div style="font-weight:800;font-size:20px">Gagal Memuat</div><div style="color:#6B7280;margin-top:10px;font-size:15px;line-height:1.5">Cek internet lalu refresh.</div><button onclick="location.reload(true)" style="margin-top:20px;padding:14px 28px;background:#DE7A8C;color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;width:100%">🔄 Refresh</button></div>';}
 }
 </script>
 <script src="app.js" defer></script>
+  <div id="undo-pill" class="undo-pill hidden">↩ Batal</div>
 </body>
 </html>

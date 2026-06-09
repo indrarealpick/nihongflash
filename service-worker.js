@@ -1,4 +1,4 @@
-const CACHE = 'nihongo-flash-v31';
+const CACHE = 'nihongo-flash-v33';
 const APP_SHELL = ['./','./index.html','./app.js','./manifest.json','./icon.svg','./icon-192.png','./icon-512.png'];
 const CDN_URLS = ['https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js'];
 
