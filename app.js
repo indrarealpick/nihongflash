@@ -348,7 +348,10 @@ async function lookupAddFav(d){
       <div class="field"><label>Kategori</label><select class="select" id="m-lk-cat" style="width:100%">${opts}</select></div>`,
     confirmText:'Tambah ⭐',
     onConfirm:async()=>{ const category_id=$('#m-lk-cat').value; const card=await createFlashcard({category_id,kanji:d.kanji,reading:d.reading,meaning:d.meaning}); if(!card)return false; await updateFlashcard(card.id,{favorite:true}); }});
-  if(ok){ toast('Ditambahkan ke favorit ⭐','success'); refreshAll(); }
+  if(ok){ toast('Ditambahkan ke favorit ⭐','success'); refreshAll();
+    const card=State.flashcards.find(f=>f.kanji===d.kanji&&!f.example_jp);
+    if(card) enrichFlashcardExample(card);
+  }
 }
 
 
@@ -445,6 +448,9 @@ function renderDashboard(){
     banner.innerHTML=`<div class="banner" style="margin-bottom:14px"><div class="grow"><div class="bt">🎉 Kerja bagus!</div><div class="bs">Semua kartu hari ini sudah selesai direview.</div></div></div>`;
   }
   renderDashDecks();
+  // First-time guide: tampil jika belum ada flashcard DAN belum ada deck progress
+  const isNewUser = State.flashcards.length===0 && Object.keys(State.deckProgress).length===0;
+  const ftEl=$('#ft-guide'); if(ftEl) ftEl.classList.toggle('hidden', !isNewUser);
   drawWeekChart();
 }
 // Render deck N5/N4/N3 di homepage (pakai cache total agar tidak query berulang)
@@ -559,6 +565,51 @@ async function confirmDeleteCategory(id){
 }
 
 /* ============================ FLASHCARD MANAGER ============================ */
+/* ============================ WEB PUSH NOTIFICATION ============================ */
+const VAPID_PUBLIC = 'BDwVLBOvKxKYmd8-UCJ6J0LvOgRkaAdkhEtSG5w2EiPAkepvI9xtx1mcyENiv-xTu_1u4XyapfNHk4-KFXp2VAU';
+const PUSH_API = CONFIG.API_URL.replace('/japanese','/push-subscribe');
+
+function urlBase64ToUint8Array(base64String){
+  const p=(4-(base64String.length%4))%4, b=(base64String+('='.repeat(p))).replace(/-/g,'+').replace(/_/g,'/');
+  const raw=atob(b); return Uint8Array.from([...raw].map(c=>c.charCodeAt(0)));
+}
+async function isPushSupported(){ return 'Notification' in window && 'serviceWorker' in navigator && 'PushManager' in window; }
+async function isPushSubscribed(){
+  if(!(await isPushSupported())) return false;
+  const reg=await navigator.serviceWorker.ready;
+  return !!(await reg.pushManager.getSubscription());
+}
+async function subscribePush(){
+  if(!(await isPushSupported())){ toast('Browser ini tidak mendukung notifikasi','warning'); return; }
+  const perm=await Notification.requestPermission();
+  if(perm!=='granted'){ toast('Izin notifikasi ditolak','warning'); return; }
+  try{
+    const reg=await navigator.serviceWorker.ready;
+    const sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlBase64ToUint8Array(VAPID_PUBLIC)});
+    const session=(await sb.auth.getSession()).data?.session;
+    if(!session) return;
+    await fetch(PUSH_API,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({user_id:session.user.id,subscription:sub.toJSON()})});
+    localStorage.setItem('nf_push','1');
+    toast('Pengingat harian aktif 🔔','success');
+  }catch(e){ toast('Gagal mengaktifkan notifikasi','error'); }
+}
+async function unsubscribePush(){
+  try{
+    const reg=await navigator.serviceWorker.ready;
+    const sub=await reg.pushManager.getSubscription();
+    if(sub) await sub.unsubscribe();
+    const session=(await sb.auth.getSession()).data?.session;
+    if(session) await fetch(PUSH_API,{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:session.user.id})});
+    localStorage.removeItem('nf_push');
+    toast('Pengingat dimatikan','success');
+  }catch(e){ toast('Gagal menonaktifkan','error'); }
+}
+async function syncPushToggle(){
+  const el=$('#set-notif'); if(!el) return;
+  el.checked=await isPushSubscribed();
+}
+
 function catName(id){ const c=State.categories.find(x=>x.id===id); return c?c.name:'—'; }
 function matchSearch(f,q){
   if(!q)return true;
@@ -581,7 +632,20 @@ function visibleFlashcards(){
 }
 function renderFlashcards(){
   const list=$('#fc-list'); const all=visibleFlashcards(); const arr=all.slice(0,State.fcLimit);
-  if(!all.length){ list.innerHTML=`<div class="empty nb"><span class="em">🃏</span>Tidak ada flashcard.</div>`; $('#fc-more').classList.add('hidden'); return; }
+  if(!all.length){
+    list.innerHTML=`<div class="empty-state">
+      <div class="es-icon">📭</div>
+      <div class="es-title">Belum ada flashcard</div>
+      <div class="es-body">Cari kata via Lookup atau buka Deck N5 untuk langsung mulai belajar kosakata JLPT.</div>
+      <div class="es-actions">
+        <button class="btn btn-primary btn-sm" id="es-fc-lookup">🔍 Cari Kata</button>
+        <button class="btn btn-ghost btn-sm" id="es-fc-deck">📖 Buka Deck N5</button>
+      </div>
+    </div>`;
+    $('#es-fc-lookup')?.addEventListener('click',()=>goto('translate'));
+    $('#es-fc-deck')?.addEventListener('click',()=>openDeck('N5'));
+    $('#fc-more').classList.add('hidden'); return;
+  }
   list.innerHTML=arr.map(f=>`<div class="row-card nb jp"><div class="grow"><div class="title">${esc(f.kanji)}</div>
     <div class="sub">${esc(f.reading||'…')} · ${esc(f.meaning||'…')}</div>
     <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap"><span class="tag gray">${esc(catName(f.category_id))}</span><span class="tag ${f.status==='hafal'?'green':''}">${f.status==='hafal'?'✓ Hafal':'Belum'}</span></div></div>
@@ -620,7 +684,10 @@ async function addFlashcardForm(presetCat){
       if(dict){ reading=dict.reading; meaning=dict.meaning; }
       else { const r=await fetchJapanese(word); reading=r.reading; meaning=r.meaning; } // 2) fallback AI (+auto simpan ke dict di backend)
       const card=await createFlashcard({category_id,kanji:word,reading,meaning}); overlayOff();
-      if(card){toast(dict?'Dari kamus 📖':'Flashcard dibuat 🎉','success'); refreshAll();}
+      if(card){
+        toast(dict?'Dari kamus 📖':'Flashcard dibuat 🎉','success'); refreshAll();
+        enrichFlashcardExample(card); // silent background: tambah contoh kalimat
+      }
     }
     catch(err){ overlayOff(); toast(err.message||'Gagal','error',4000); manualFallback(category_id,word); }
   };
@@ -711,12 +778,36 @@ async function runBatch(category_id, raw, skipExisting, root){
 // Batch preload contoh kalimat dari dictionary (no AI during review = keep it fast)
 async function preloadExamples(cards){
   if(!cards||!cards.length) return;
-  const kanjis=[...new Set(cards.map(c=>c.kanji).filter(Boolean))];
-  if(!kanjis.length) return;
+  // Prioritas 1: gunakan example dari flashcard itu sendiri
+  cards.forEach(c=>{ if(c.example_jp) State.studyExamples[c.kanji]={jp:c.example_jp,id:c.example_id||''}; });
+  // Prioritas 2: ambil dari dictionary untuk yang belum punya
+  const missing=[...new Set(cards.filter(c=>c.kanji&&!State.studyExamples[c.kanji]).map(c=>c.kanji))];
+  if(!missing.length) return;
   try{
-    const {data}=await sb.from('dictionary').select('kanji,example_jp,example_id').in('kanji',kanjis);
+    const {data}=await sb.from('dictionary').select('kanji,example_jp,example_id').in('kanji',missing);
     (data||[]).forEach(d=>{ if(d.example_jp) State.studyExamples[d.kanji]={jp:d.example_jp,id:d.example_id||''}; });
   }catch(e){}
+}
+// Enrich flashcard dengan contoh kalimat via AI (silent background — tidak block UI)
+async function enrichFlashcardExample(card){
+  if(!card||!card.kanji||!card.id) return;
+  if(card.example_jp) return; // sudah ada
+  try{
+    const res=await fetch(EX_API,{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({word:card.kanji,reading:card.reading,meaning:card.meaning}),
+      signal:AbortSignal.timeout(20000)
+    });
+    const data=await res.json();
+    if(!res.ok||!data.example_jp) return;
+    // Simpan ke flashcard di DB
+    await sb.from('flashcards').update({example_jp:data.example_jp,example_id:data.example_id||''}).eq('id',card.id);
+    // Update state lokal
+    const fc=State.flashcards.find(f=>f.id===card.id);
+    if(fc){ fc.example_jp=data.example_jp; fc.example_id=data.example_id||''; }
+    // Cache untuk sesi ini
+    if(card.kanji) State.studyExamples[card.kanji]={jp:data.example_jp,id:data.example_id||''};
+  }catch(e){} // silent fail
 }
 function renderExample(kanji, elId){
   const el=$(elId); if(!el) return;
@@ -829,21 +920,19 @@ function reviewShowAnswer(){
 }
 async function reviewGrade(grade){
   const f=State.review.list[State.review.idx]; if(!f)return;
-  // Save undo stack before modifying
   State.undoStack={card:{...f}, idx:State.review.idx, grade};
-  // Track session stats
   State.sessionStats.total++;
   if(grade==='sulit') State.sessionStats.sulit++;
-  else if(grade==='normal') State.sessionStats.normal++;
   else State.sessionStats.mudah++;
 
   let level=f.review_level||0, next;
-  if(grade==='sulit'){ level=Math.max(0,level-1); next=addDays(1); }
-  else if(grade==='normal'){ level=Math.min(6,level+1); next=addDays(SRS_DAYS[level]||1); }
-  else { level=Math.min(6,level+2); next=addDays(SRS_DAYS[level]||1); }
+  if(grade==='sulit'){      level=Math.max(0,level-1);              next=addDays(1); }
+  else if(grade==='sedang'){ level=Math.min(6,level+1);             next=addDays(SRS_DAYS[level]||1); }
+  else if(grade==='bagus'){  level=Math.min(6,level+2);             next=addDays(SRS_DAYS[level]||1); }
+  else {                     level=Math.min(6,level+3);             next=addDays(SRS_DAYS[Math.min(6,level)]||1); }
+
   const patch={review_level:level,next_review_date:next,last_reviewed_at:new Date().toISOString(),review_count:(f.review_count||0)+1};
   if(grade!=='sulit') patch.status='hafal';
-  // Save patch to undo
   State.undoStack.patch=patch;
   State.undoStack.prevPatch={review_level:f.review_level||0,next_review_date:f.next_review_date||null,last_reviewed_at:f.last_reviewed_at||null,review_count:f.review_count||0,status:f.status||'belum_hafal'};
   await updateFlashcard(f.id,patch);
@@ -919,7 +1008,19 @@ function renderNotes(){
   }
   // Manual notes
   const list=$('#note-list');
-  if(!photos.length && !manuals.length){ list.innerHTML=`<div class="empty nb"><span class="em">📝</span>Belum ada catatan.</div>`; }
+  if(!photos.length && !manuals.length){
+    list.innerHTML=`<div class="empty-state">
+      <div class="es-icon">📓</div>
+      <div class="es-title">Belum ada catatan</div>
+      <div class="es-body">Simpan catatan vocab, grammar, atau foto materi belajar agar mudah diakses kapan saja.</div>
+      <div class="es-actions">
+        <button class="btn btn-primary" id="es-note-add">+ Catatan Teks</button>
+        <button class="btn btn-ghost" id="es-note-photo">📷 Upload Foto</button>
+      </div>
+    </div>`;
+    $('#es-note-add')?.addEventListener('click',()=>noteForm(null));
+    $('#es-note-photo')?.addEventListener('click',()=>$('#note-photo-file')?.click());
+  }
   else {
     list.innerHTML=manuals.map(n=>`<div class="row-card nb"><div class="grow"><div class="title">${esc(n.title)}</div>
       <div class="sub">${esc((n.content||'').slice(0,80))}${(n.content||'').length>80?'…':''}</div>
@@ -1050,7 +1151,11 @@ async function addDictToFlashcard(d){
       <div class="field"><label>Kategori</label><select class="select" id="m-da-cat" style="width:100%">${opts}</select></div>`,
     confirmText:'Tambah',
     onConfirm:async()=>{ const category_id=$('#m-da-cat').value; const card=await createFlashcard({category_id,kanji:d.kanji,reading:d.reading,meaning:d.meaning}); if(!card)return false; }});
-  if(ok){ toast('Ditambahkan ke flashcard 🎉','success'); refreshAll(); }
+  if(ok){ toast('Ditambahkan ke flashcard 🎉','success'); refreshAll();
+    // Enrich contoh kalimat di background (silent)
+    const card=State.flashcards.find(f=>f.kanji===d.kanji&&!f.example_jp);
+    if(card) enrichFlashcardExample(card);
+  }
 }
 
 /* ============================ BUILT-IN DECK (N5/N4/N3) ============================ */
@@ -1200,6 +1305,7 @@ function renderSettings(){
   if(delBtn) delBtn.classList.toggle('hidden', !avatarUrl);
   $('#set-autoplay').checked=State.autoplay;
   $('#set-theme').checked = (State.theme==='dark');
+  syncPushToggle(); // async, non-blocking
   populateVoicePicker();
 }
 function exportData(){
@@ -1267,6 +1373,10 @@ function bindEvents(){
   if($('#qa-add')) $('#qa-add').onclick=()=>addFlashcardForm();
   if($('#qa-review')) $('#qa-review').onclick=()=>goto('review');
   if($('#qa-fav')) $('#qa-fav').onclick=()=>{ goto('flashcard'); if($('#fc-status')){ $('#fc-status').value='favorite'; renderFlashcards(); } };
+  // First-time guide buttons
+  $('#ft-deck')?.addEventListener('click',()=>openDeck('N5'));
+  $('#ft-lookup')?.addEventListener('click',()=>goto('translate'));
+  $('#ft-add')?.addEventListener('click',()=>addFlashcardForm());
   bindOnboarding();
   bindLookup();
   $('#fc-study-btn').onclick=startStudy;
@@ -1297,8 +1407,8 @@ function bindEvents(){
   bindSwipe($('#rflip'),{
     onTap: ()=>{ if(!State.review.shown) reviewShowAnswer(); },
     onLeft: ()=>{ if(State.review.shown) reviewGrade('sulit'); },
-    onRight: ()=>{ if(State.review.shown) reviewGrade('mudah'); },
-    onUp: ()=>{ if(!State.review.shown) reviewShowAnswer(); else reviewGrade('normal'); }
+    onRight: ()=>{ if(State.review.shown) reviewGrade('bagus'); },
+    onUp: ()=>{ if(!State.review.shown) reviewShowAnswer(); else reviewGrade('sedang'); }
   });
   // Undo pill
   $('#undo-pill')?.addEventListener('click', undoReview);
@@ -1324,6 +1434,7 @@ function bindEvents(){
   $('#set-autoplay')?.addEventListener('change',e=>{ State.autoplay=e.target.checked; localStorage.setItem('nf_autoplay',State.autoplay?'1':'0'); });
   $('#set-voice')?.addEventListener('change',e=>{ Speech.setVoice(e.target.value); if(e.target.value) toast('Voice diubah','success',1200); });
   $('#set-theme')?.addEventListener('change',e=>{ applyTheme(e.target.checked?'dark':'light'); });
+  $('#set-notif')?.addEventListener('change',async e=>{ if(e.target.checked) await subscribePush(); else await unsubscribePush(); });
   // Avatar upload (Settings + Dashboard avatar tap)
   ['#set-avatar','#dash-avatar'].forEach(sel=>{
     $(sel)?.addEventListener('click',()=>$('#avatar-file')?.click());

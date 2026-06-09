@@ -236,8 +236,9 @@ input,select,textarea{font-family:inherit}
 .study-actions{display:flex;gap:12px;width:100%;max-width:420px}
 .study-nav{display:flex;gap:12px;width:100%;max-width:420px}
 .review-grade{display:flex;gap:8px;width:100%;max-width:420px}
-.review-grade .btn{flex-direction:column;gap:3px;font-size:13px;padding:14px 6px;min-height:auto;border-radius:16px}
-.review-grade .em{font-size:20px}
+.grade-btn{flex:1;flex-direction:column;gap:3px;font-size:12px;font-weight:700;padding:12px 4px;min-height:auto;border-radius:14px;color:#fff;border:none}
+.grade-btn .gr-em{font-size:20px;line-height:1}
+.grade-sulit{background:#EF4444}.grade-sedang{background:#F59E0B}.grade-bagus{background:#22C55E}.grade-mudah{background:#3B82F6}
 
 /* === CHARTS === */
 .chart-card{padding:20px;border-radius:var(--radius-lg)}.chart-card canvas{width:100%;height:auto;display:block}
@@ -457,6 +458,24 @@ input,select,textarea{font-family:inherit}
 .undo-pill.hiding{animation:fadeOut .25s ease forwards}
 @keyframes slideUp{from{opacity:0;transform:translateX(-50%) translateY(12px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 @keyframes fadeOut{to{opacity:0;transform:translateX(-50%) translateY(8px)}}
+/* === FIRST-TIME GUIDE + EMPTY STATES === */
+.ft-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;box-shadow:var(--shadow-sm);margin-bottom:4px}
+.ft-title{font-size:17px;font-weight:800;color:var(--text)}
+.ft-sub{font-size:13px;font-weight:500;color:var(--text-2);margin-top:4px;margin-bottom:16px}
+.ft-opts{display:flex;flex-direction:column;gap:10px}
+.ft-opt{background:var(--bg);border:1.5px solid var(--border);border-radius:16px;padding:14px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .2s;text-align:left;width:100%}
+.ft-opt:hover,.ft-opt:active{border-color:var(--primary);background:var(--primary-soft);transform:scale(.99)}
+.ft-opt-ic{font-size:26px;line-height:1;flex:0 0 auto;width:36px;text-align:center}
+.ft-opt-title{font-weight:700;font-size:14px;color:var(--text)}
+.ft-opt-desc{font-size:12px;font-weight:500;color:var(--text-2);margin-top:2px}
+[data-theme="dark"] .ft-opt{background:#1C1B1F;border-color:#3A3940}
+[data-theme="dark"] .ft-opt:hover{background:rgba(222,122,140,.1);border-color:var(--primary)}
+.empty-state{text-align:center;padding:40px 16px;display:flex;flex-direction:column;align-items:center;gap:12px}
+.es-icon{font-size:52px;line-height:1}
+.es-title{font-size:18px;font-weight:800;color:var(--text)}
+.es-body{font-size:14px;font-weight:500;color:var(--text-2);line-height:1.6;max-width:280px}
+.es-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:4px}
+.es-actions .btn{flex:1;min-width:130px}
 </style>
 </head>
 <body>
@@ -568,6 +587,39 @@ input,select,textarea{font-family:inherit}
         <div class="today-item"><div class="ti-ic rose"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></div><div class="ti-n" id="today-review">0</div><div class="ti-l">Review</div></div>
         <div class="today-item"><div class="ti-ic rose"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div><div class="ti-n" id="today-new">0</div><div class="ti-l">Kata Baru</div></div>
         <div class="today-item"><div class="ti-ic muted"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="ti-n" id="today-time">0<span style="font-size:12px"> mnt</span></div><div class="ti-l">Estimasi</div></div>
+      </div>
+
+      <!-- First-time guide (tampil saat belum ada flashcard) -->
+      <div id="ft-guide" class="hidden">
+        <div class="ft-card">
+          <div class="ft-header">
+            <div class="ft-title">🎌 Mulai Perjalanan Belajarmu</div>
+            <div class="ft-sub">Pilih cara yang kamu suka untuk memulai:</div>
+          </div>
+          <div class="ft-opts">
+            <button class="ft-opt" id="ft-deck">
+              <span class="ft-opt-ic">🗂️</span>
+              <div class="ft-opt-body">
+                <div class="ft-opt-title">Buka Deck N5</div>
+                <div class="ft-opt-desc">298 kata dasar siap dipelajari</div>
+              </div>
+            </button>
+            <button class="ft-opt" id="ft-lookup">
+              <span class="ft-opt-ic">🔍</span>
+              <div class="ft-opt-body">
+                <div class="ft-opt-title">Cari Kata via Lookup</div>
+                <div class="ft-opt-desc">Cari kata lalu simpan ke flashcard</div>
+              </div>
+            </button>
+            <button class="ft-opt" id="ft-add">
+              <span class="ft-opt-ic">✏️</span>
+              <div class="ft-opt-body">
+                <div class="ft-opt-title">Tambah Kata Manual</div>
+                <div class="ft-opt-desc">Buat kartu kosakatamu sendiri</div>
+              </div>
+            </button>
+          </div>
+        </div>
       </div>
 
       <!-- Deck Belajar (fitur utama) -->
@@ -741,14 +793,15 @@ input,select,textarea{font-family:inherit}
             <div class="rd-lbl">Cara Baca</div><div class="reading" id="review-reading">—</div>
             <div class="mn-lbl">Arti</div><div class="meaning" id="review-meaning">—</div>
             <div class="fc-example hidden" id="review-example"></div>
-            <div class="flip-swipe-hints"><span class="sh-l">← Sulit</span><span class="sh-u">↑ Normal</span><span class="sh-r">Mudah →</span></div>
+            <div class="flip-swipe-hints"><span class="sh-l">← Sulit</span><span class="sh-u">↑ Sedang</span><span class="sh-r">Bagus →</span></div>
           </div>
         </div></div>
         <button class="btn btn-primary" id="review-show">Tampilkan Jawaban</button>
         <div class="review-grade hidden" id="review-grade">
-          <button class="btn btn-danger" data-grade="sulit"><span class="em">😵</span>Sulit</button>
-          <button class="btn btn-warning" data-grade="normal"><span class="em">🙂</span>Normal</button>
-          <button class="btn btn-accent" data-grade="mudah"><span class="em">😎</span>Mudah</button>
+          <button class="btn grade-btn grade-sulit" data-grade="sulit"><span class="gr-em">😵</span><span>Sulit</span></button>
+          <button class="btn grade-btn grade-sedang" data-grade="sedang"><span class="gr-em">🤔</span><span>Sedang</span></button>
+          <button class="btn grade-btn grade-bagus" data-grade="bagus"><span class="gr-em">🙂</span><span>Bagus</span></button>
+          <button class="btn grade-btn grade-mudah" data-grade="mudah"><span class="gr-em">😄</span><span>Mudah</span></button>
         </div>
       </div>
       <div class="session-summary hidden" id="review-summary">
@@ -911,6 +964,10 @@ input,select,textarea{font-family:inherit}
         <select class="select" id="set-voice" style="width:auto;max-width:55%"><option>Default</option></select>
       </div>
       <div class="section-title">Tampilan</div>
+      <div class="set-item nb">
+        <div class="grow"><div class="t">Pengingat Harian</div><div class="d">Notifikasi belajar tiap hari jam 19.00</div></div>
+        <label class="switch"><input type="checkbox" id="set-notif"/><span class="track"><span class="knob"></span></span></label>
+      </div>
       <div class="set-item nb">
         <div class="grow"><div class="t">Mode Gelap</div><div class="d">Nyaman di mata, hemat baterai</div></div>
         <label class="switch"><input type="checkbox" id="set-theme"/><span class="track"><span class="knob"></span></span></label>

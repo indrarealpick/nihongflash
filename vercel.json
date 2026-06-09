@@ -12,6 +12,12 @@
     },
     "api/example.js": {
       "maxDuration": 25
+    },
+    "api/push-subscribe.js": {
+      "maxDuration": 15
+    },
+    "api/push-send.js": {
+      "maxDuration": 30
     }
   },
   "headers": [
