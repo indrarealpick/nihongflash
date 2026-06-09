@@ -1,0 +1,16 @@
+name: Daily Study Reminder
+
+on:
+  schedule:
+    - cron: '0 12 * * *'  # 12:00 UTC = 19:00 WIB setiap hari
+  workflow_dispatch:       # bisa trigger manual
+
+jobs:
+  send-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send daily push notification
+        run: |
+          curl -X POST https://nihongodeck.vercel.app/api/push-send \
+            -H "Content-Type: application/json" \
+            -d "{\"secret\":\"${{ secrets.PUSH_SECRET }}\"}"
