@@ -1427,9 +1427,8 @@ function bindEvents(){
   $('#study-hafal').onclick=e=>{e.stopPropagation();studySetStatus('hafal');};
   $('#study-belum').onclick=e=>{e.stopPropagation();studySetStatus('belum_hafal');};
   $('#study-prev').onclick=()=>studyMove(-1); $('#study-next').onclick=()=>studyMove(1);
-  // Swipe gesture: study deck (← belum hafal, → hafal)
+  // Swipe gesture: study deck (← belum hafal, → hafal) — TAP ditangani onclick di atas
   bindSwipe($('#flip'),{
-    onTap: flipStudy,
     onLeft: ()=>{ if(State.study.flipped) studySetStatus('belum_hafal'); },
     onRight: ()=>{ if(State.study.flipped) studySetStatus('hafal'); }
   });
